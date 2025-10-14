@@ -1,3 +1,4 @@
+import { Database } from "@/app/types/database.types"
 import { createClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
 
@@ -17,7 +18,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true }, { status: 200 })
     }
 
-    const toggle = pinned
+    const toggle: Database["public"]["Tables"]["chats"]["Update"] = pinned
       ? { pinned: true, pinned_at: new Date().toISOString() }
       : { pinned: false, pinned_at: null }
 

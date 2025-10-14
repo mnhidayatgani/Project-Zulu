@@ -1,3 +1,4 @@
+import { Database } from "@/app/types/database.types"
 import {
   AUTH_DAILY_MESSAGE_LIMIT,
   DAILY_LIMIT_PRO_MODELS,
@@ -16,7 +17,10 @@ export async function getMessageUsage(
     .from("users")
     .select("daily_message_count, daily_pro_message_count")
     .eq("id", userId)
-    .maybeSingle()
+    .maybeSingle<{
+      daily_message_count: number | null
+      daily_pro_message_count: number | null
+    }>()
 
   if (error || !data) {
     throw new Error(error?.message || "Failed to fetch message usage")

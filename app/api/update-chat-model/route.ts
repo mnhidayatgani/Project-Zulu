@@ -1,3 +1,4 @@
+import { Database } from "@/app/types/database.types"
 import { createClient } from "@/lib/supabase/server"
 
 export async function POST(request: Request) {
@@ -18,9 +19,11 @@ export async function POST(request: Request) {
       return new Response(JSON.stringify({ success: true }), { status: 200 })
     }
 
+    const updateData: Database["public"]["Tables"]["chats"]["Update"] = { model }
+    
     const { error } = await supabase
       .from("chats")
-      .update({ model })
+      .update(updateData)
       .eq("id", chatId)
 
     if (error) {

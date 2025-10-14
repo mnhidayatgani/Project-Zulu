@@ -1,3 +1,4 @@
+import { Database } from "@/app/types/database.types"
 import { createGuestServerClient } from "@/lib/supabase/server-guest"
 
 export async function POST(request: Request) {
@@ -29,16 +30,18 @@ export async function POST(request: Request) {
       .maybeSingle()
 
     if (!userData) {
+      const insertData: Database["public"]["Tables"]["users"]["Insert"] = {
+        id: userId,
+        email: `${userId}@anonymous.example`,
+        anonymous: true,
+        message_count: 0,
+        premium: false,
+        created_at: new Date().toISOString(),
+      }
+      
       const { data, error } = await supabase
         .from("users")
-        .insert({
-          id: userId,
-          email: `${userId}@anonymous.example`,
-          anonymous: true,
-          message_count: 0,
-          premium: false,
-          created_at: new Date().toISOString(),
-        })
+        .insert(insertData)
         .select("*")
         .single()
 

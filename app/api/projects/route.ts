@@ -1,3 +1,4 @@
+import { Database } from "@/app/types/database.types"
 import { createClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
 
@@ -24,9 +25,14 @@ export async function POST(request: Request) {
 
     const { name } = await request.json()
 
+    const insertData: Database["public"]["Tables"]["projects"]["Insert"] = {
+      name,
+      user_id: userId,
+    }
+
     const { data, error } = await supabase
       .from("projects")
-      .insert({ name, user_id: userId })
+      .insert(insertData)
       .select()
       .single()
 

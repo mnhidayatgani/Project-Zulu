@@ -1,3 +1,4 @@
+import { Database } from "@/app/types/database.types"
 import { createClient } from "@/lib/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
 
@@ -79,9 +80,13 @@ export async function PUT(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
+    const updateData: Database["public"]["Tables"]["projects"]["Update"] = { 
+      name: name.trim() 
+    }
+    
     const { data, error } = await supabase
       .from("projects")
-      .update({ name: name.trim() })
+      .update(updateData)
       .eq("id", projectId)
       .eq("user_id", authData.user.id)
       .select()

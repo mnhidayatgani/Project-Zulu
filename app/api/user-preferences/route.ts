@@ -27,7 +27,7 @@ export async function GET() {
       .from("user_preferences")
       .select("*")
       .eq("user_id", user.id)
-      .single()
+      .single<Database["public"]["Tables"]["user_preferences"]["Row"]>()
 
     if (error) {
       // If no preferences exist, return defaults
@@ -114,7 +114,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // Prepare update object with only provided fields
-    const updateData: any = {}
+    const updateData: Partial<Database["public"]["Tables"]["user_preferences"]["Update"]> = {}
     if (layout !== undefined) updateData.layout = layout
     if (prompt_suggestions !== undefined)
       updateData.prompt_suggestions = prompt_suggestions
@@ -126,20 +126,17 @@ export async function PUT(request: NextRequest) {
       updateData.multi_model_enabled = multi_model_enabled
     if (hidden_models !== undefined) updateData.hidden_models = hidden_models
 
+    const upsertData: Database["public"]["Tables"]["user_preferences"]["Insert"] = {
+      user_id: user.id,
+      ...updateData,
+    }
+
     // Try to update first, then insert if doesn't exist
     const { data, error } = await supabase
       .from("user_preferences")
-      .upsert(
-        {
-          user_id: user.id,
-          ...updateData,
-        },
-        {
-          onConflict: "user_id",
-        }
-      )
+      .upsert(upsertData, { onConflict: "user_id" })
       .select("*")
-      .single()
+      .single<Database["public"]["Tables"]["user_preferences"]["Row"]>()
 
     if (error) {
       console.error("Error updating user preferences:", error)
