@@ -1,0 +1,10 @@
+.agent-memory/
+scripts/memory-cli.js
+AGENT_MEMORY.md
+CLAUDE.md
+DEV_WORKFLOW.md
+CODE_OF_CONDUCT.md
+.git/
+.github/
+*.log
+.DS_Store

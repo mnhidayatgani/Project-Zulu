@@ -138,6 +138,97 @@ export async function signInWithGoogle(supabase: SupabaseClient) {
   }
 }
 
+/**
+ * Signs in user with email and password
+ */
+export async function signInWithEmail(
+  supabase: SupabaseClient,
+  email: string,
+  password: string
+) {
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
+
+    if (error) {
+      throw error
+    }
+
+    return data
+  } catch (err) {
+    console.error("Error signing in with email:", err)
+    throw err
+  }
+}
+
+/**
+ * Signs up user with email and password
+ */
+export async function signUpWithEmail(
+  supabase: SupabaseClient,
+  email: string,
+  password: string
+) {
+  try {
+    const isDev = process.env.NODE_ENV === "development"
+    const baseUrl = isDev
+      ? "http://localhost:3000"
+      : typeof window !== "undefined"
+        ? window.location.origin
+        : process.env.NEXT_PUBLIC_VERCEL_URL
+          ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+          : APP_DOMAIN
+
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${baseUrl}/auth/callback`,
+      },
+    })
+
+    if (error) {
+      throw error
+    }
+
+    return data
+  } catch (err) {
+    console.error("Error signing up with email:", err)
+    throw err
+  }
+}
+
+/**
+ * Sends password reset email
+ */
+export async function resetPassword(supabase: SupabaseClient, email: string) {
+  try {
+    const isDev = process.env.NODE_ENV === "development"
+    const baseUrl = isDev
+      ? "http://localhost:3000"
+      : typeof window !== "undefined"
+        ? window.location.origin
+        : process.env.NEXT_PUBLIC_VERCEL_URL
+          ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+          : APP_DOMAIN
+
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${baseUrl}/auth/reset-password`,
+    })
+
+    if (error) {
+      throw error
+    }
+
+    return data
+  } catch (err) {
+    console.error("Error resetting password:", err)
+    throw err
+  }
+}
+
 export const getOrCreateGuestUserId = async (
   user: UserProfile | null
 ): Promise<string | null> => {
