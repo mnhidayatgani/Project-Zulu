@@ -182,7 +182,6 @@ export {
 
 // Execution Tracking
 export {
-  trackToolExecution,
   createTrackedTool,
   batchTrackExecutions,
 } from './track-execution'
