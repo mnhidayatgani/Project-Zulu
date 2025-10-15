@@ -128,6 +128,19 @@ export {
   analyticsStore,
 } from './analytics'
 
+// Discovery
+export {
+  discoverServers,
+  getServerCategories,
+  getPopularServers,
+  getRecentServers,
+  getRecommendedServers,
+  searchServers,
+  PUBLIC_SERVER_REGISTRY,
+  type DiscoverableServer,
+  type DiscoveryFilters,
+} from './discovery'
+
 /**
  * Quick start guide for using MCP in Zola
  * 
