@@ -407,3 +407,107 @@ export async function migrateToSupabase(): Promise<{
     }
   }
 }
+
+/**
+ * Get sync statistics
+ */
+export async function getSyncStats(): Promise<{
+  favorites: number
+  collections: number
+  searches: number
+  history: number
+  executions: number
+  totalSize: number
+}> {
+  try {
+    const { createClient } = await import('@/lib/supabase/client')
+    const supabase = createClient()
+
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      return {
+        favorites: 0,
+        collections: 0,
+        searches: 0,
+        history: 0,
+        executions: 0,
+        totalSize: 0
+      }
+    }
+
+    // Get counts from all tables
+    const [
+      favoritesResult,
+      collectionsResult,
+      searchesResult,
+      historyResult,
+      executionsResult
+    ] = await Promise.all([
+      supabase.from('mcp_favorites').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
+      supabase.from('mcp_favorite_collections').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
+      supabase.from('mcp_saved_searches').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
+      supabase.from('mcp_search_history').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
+      supabase.from('mcp_execution_history').select('*', { count: 'exact', head: true }).eq('user_id', user.id)
+    ])
+
+    // Estimate total size (rough approximation)
+    const totalSize = 
+      ((favoritesResult.count || 0) * 500) + // ~500 bytes per favorite
+      ((collectionsResult.count || 0) * 300) + // ~300 bytes per collection
+      ((searchesResult.count || 0) * 200) + // ~200 bytes per search
+      ((historyResult.count || 0) * 150) + // ~150 bytes per history item
+      ((executionsResult.count || 0) * 1000) // ~1KB per execution
+
+    return {
+      favorites: favoritesResult.count || 0,
+      collections: collectionsResult.count || 0,
+      searches: searchesResult.count || 0,
+      history: historyResult.count || 0,
+      executions: executionsResult.count || 0,
+      totalSize
+    }
+  } catch (error) {
+    console.error('Failed to get sync stats:', error)
+    return {
+      favorites: 0,
+      collections: 0,
+      searches: 0,
+      history: 0,
+      executions: 0,
+      totalSize: 0
+    }
+  }
+}
+
+/**
+ * Enable or disable auto-sync
+ */
+export async function setAutoSync(enabled: boolean): Promise<void> {
+  if (syncState) {
+    syncState.autoSyncEnabled = enabled
+    
+    // Save preference to localStorage
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('mcp_auto_sync_enabled', enabled ? 'true' : 'false')
+    }
+
+    console.log('Auto-sync', enabled ? 'enabled' : 'disabled')
+  }
+}
+
+/**
+ * Check if auto-sync is enabled
+ */
+export function isAutoSyncEnabled(): boolean {
+  if (syncState) {
+    return syncState.autoSyncEnabled
+  }
+
+  // Check localStorage
+  if (typeof window !== 'undefined') {
+    const stored = localStorage.getItem('mcp_auto_sync_enabled')
+    return stored !== 'false' // Default to true
+  }
+
+  return true
+}
