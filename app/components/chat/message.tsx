@@ -1,5 +1,5 @@
 import { Message as MessageType } from "@ai-sdk/react"
-import React, { useState } from "react"
+import React, { memo, useState } from "react"
 import { MessageAssistant } from "./message-assistant"
 import { MessageUser } from "./message-user"
 
@@ -19,7 +19,7 @@ type MessageProps = {
   onQuote?: (text: string, messageId: string) => void
 }
 
-export function Message({
+const MessageComponent = ({
   variant,
   children,
   id,
@@ -33,7 +33,7 @@ export function Message({
   status,
   className,
   onQuote,
-}: MessageProps) {
+}: MessageProps) => {
   const [copied, setCopied] = useState(false)
 
   const copyToClipboard = () => {
@@ -81,3 +81,21 @@ export function Message({
 
   return null
 }
+
+// Memoized version with custom comparison
+export const Message = memo(MessageComponent, (prevProps, nextProps) => {
+  // Only re-render if these specific props change
+  return (
+    prevProps.id === nextProps.id &&
+    prevProps.children === nextProps.children &&
+    prevProps.isLast === nextProps.isLast &&
+    prevProps.status === nextProps.status &&
+    prevProps.hasScrollAnchor === nextProps.hasScrollAnchor &&
+    prevProps.variant === nextProps.variant &&
+    // Deep compare parts if they exist
+    JSON.stringify(prevProps.parts) === JSON.stringify(nextProps.parts) &&
+    JSON.stringify(prevProps.attachments) === JSON.stringify(nextProps.attachments)
+  )
+})
+
+Message.displayName = "Message"

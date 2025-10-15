@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils"
 import { Message as MessageType } from "@ai-sdk/react"
 import { Check, Copy, Trash } from "@phosphor-icons/react"
 import Image from "next/image"
-import { useRef, useState } from "react"
+import { memo, useCallback, useRef, useState } from "react"
 
 const getTextFromDataUrl = (dataUrl: string) => {
   const base64 = dataUrl.split(",")[1]
@@ -39,7 +39,7 @@ export type MessageUserProps = {
   className?: string
 }
 
-export function MessageUser({
+const MessageUserComponent = ({
   hasScrollAnchor,
   attachments,
   children,
@@ -50,27 +50,27 @@ export function MessageUser({
   onDelete,
   id,
   className,
-}: MessageUserProps) {
+}: MessageUserProps) => {
   const [editInput, setEditInput] = useState(children)
   const [isEditing, setIsEditing] = useState(false)
   const contentRef = useRef<HTMLDivElement>(null)
 
-  const handleEditCancel = () => {
+  const handleEditCancel = useCallback(() => {
     setIsEditing(false)
     setEditInput(children)
-  }
+  }, [children])
 
-  const handleSave = () => {
+  const handleSave = useCallback(() => {
     if (onEdit) {
       onEdit(id, editInput)
     }
     onReload()
     setIsEditing(false)
-  }
+  }, [id, editInput, onEdit, onReload])
 
-  const handleDelete = () => {
+  const handleDelete = useCallback(() => {
     onDelete(id)
-  }
+  }, [id, onDelete])
 
   return (
     <MessageContainer
@@ -220,3 +220,17 @@ export function MessageUser({
     </MessageContainer>
   )
 }
+
+// Memoized export
+export const MessageUser = memo(MessageUserComponent, (prevProps, nextProps) => {
+  // Only re-render if essential props change
+  return (
+    prevProps.id === nextProps.id &&
+    prevProps.children === nextProps.children &&
+    prevProps.copied === nextProps.copied &&
+    prevProps.hasScrollAnchor === nextProps.hasScrollAnchor &&
+    JSON.stringify(prevProps.attachments) === JSON.stringify(nextProps.attachments)
+  )
+})
+
+MessageUser.displayName = "MessageUser"

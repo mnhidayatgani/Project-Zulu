@@ -5,7 +5,7 @@ import {
 import { Loader } from "@/components/prompt-kit/loader"
 import { ScrollButton } from "@/components/prompt-kit/scroll-button"
 import { Message as MessageType } from "@ai-sdk/react"
-import { useRef } from "react"
+import { memo, useCallback, useMemo, useRef } from "react"
 import { Message } from "./message"
 
 type ConversationProps = {
@@ -17,15 +17,45 @@ type ConversationProps = {
   onQuote?: (text: string, messageId: string) => void
 }
 
-export function Conversation({
+const ConversationComponent = ({
   messages,
   status = "ready",
   onDelete,
   onEdit,
   onReload,
   onQuote,
-}: ConversationProps) {
+}: ConversationProps) => {
   const initialMessageCount = useRef(messages.length)
+
+  // Memoize rendered messages to prevent unnecessary re-renders
+  const renderedMessages = useMemo(() => {
+    if (!messages || messages.length === 0) return null
+
+    return messages.map((message, index) => {
+      const isLast = index === messages.length - 1 && status !== "submitted"
+      const hasScrollAnchor =
+        isLast && messages.length > initialMessageCount.current
+
+      return (
+        <Message
+          key={message.id}
+          id={message.id}
+          variant={message.role}
+          attachments={message.experimental_attachments}
+          isLast={isLast}
+          onDelete={onDelete}
+          onEdit={onEdit}
+          onReload={onReload}
+          hasScrollAnchor={hasScrollAnchor}
+          parts={message.parts}
+          status={status}
+          onQuote={onQuote}
+        >
+          {message.content}
+        </Message>
+      )
+    })
+  }, [messages, status, onDelete, onEdit, onReload, onQuote])
 
   if (!messages || messages.length === 0)
     return <div className="h-full w-full"></div>
@@ -44,31 +74,7 @@ export function Conversation({
             scrollbarWidth: "none",
           }}
         >
-          {messages?.map((message, index) => {
-            const isLast =
-              index === messages.length - 1 && status !== "submitted"
-            const hasScrollAnchor =
-              isLast && messages.length > initialMessageCount.current
-
-            return (
-              <Message
-                key={message.id}
-                id={message.id}
-                variant={message.role}
-                attachments={message.experimental_attachments}
-                isLast={isLast}
-                onDelete={onDelete}
-                onEdit={onEdit}
-                onReload={onReload}
-                hasScrollAnchor={hasScrollAnchor}
-                parts={message.parts}
-                status={status}
-                onQuote={onQuote}
-              >
-                {message.content}
-              </Message>
-            )
-          })}
+          {renderedMessages}
           {status === "submitted" &&
             messages.length > 0 &&
             messages[messages.length - 1].role === "user" && (
@@ -84,3 +90,17 @@ export function Conversation({
     </div>
   )
 }
+
+// Memoized export
+export const Conversation = memo(ConversationComponent, (prevProps, nextProps) => {
+  // Only re-render if messages or status change
+  return (
+    prevProps.status === nextProps.status &&
+    prevProps.messages.length === nextProps.messages.length &&
+    // Check if last message changed (for streaming updates)
+    prevProps.messages[prevProps.messages.length - 1]?.content ===
+      nextProps.messages[nextProps.messages.length - 1]?.content
+  )
+})
+
+Conversation.displayName = "Conversation"
