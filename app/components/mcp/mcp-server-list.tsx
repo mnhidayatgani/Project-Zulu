@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
 import { CheckCircle, XCircle, Spinner, Plugs, Trash } from "@phosphor-icons/react"
+import { MCPConnectionIndicator } from "./mcp-connection-indicator"
 import type { MCPServerConfig } from "@/lib/mcp"
 
 interface MCPServerWithState extends MCPServerConfig {
@@ -125,19 +126,15 @@ export function MCPServerList() {
               <div className="flex-1">
                 <div className="flex items-center gap-2">
                   <CardTitle className="text-base">{server.name}</CardTitle>
-                  {server.state && (
-                    <Badge variant={server.state.connected ? "default" : "secondary"}>
-                      {server.state.connected ? (
-                        <>
-                          <CheckCircle className="size-3 mr-1" weight="fill" />
-                          Connected
-                        </>
-                      ) : (
-                        <>
-                          <XCircle className="size-3 mr-1" weight="fill" />
-                          Disconnected
-                        </>
-                      )}
+                  {/* Real-time connection indicator */}
+                  <MCPConnectionIndicator 
+                    serverId={server.id}
+                    size="sm"
+                    showLabel={false}
+                  />
+                  {server.state && server.state.toolCount > 0 && (
+                    <Badge variant="outline" className="text-xs">
+                      {server.state.toolCount} tools
                     </Badge>
                   )}
                 </div>

@@ -141,6 +141,52 @@ export {
   type DiscoveryFilters,
 } from './discovery'
 
+// Favorites
+export {
+  addFavorite,
+  removeFavorite,
+  getFavorites,
+  isFavorite,
+  toggleFavorite,
+  sortFavorites,
+  searchFavorites,
+  exportFavorites,
+  importFavorites,
+  type FavoriteTool,
+  type FavoriteCollection,
+  type FavoriteSortBy,
+} from './favorites'
+
+// Search
+export {
+  searchToolsAdvanced,
+  saveSearch,
+  getSavedSearches,
+  getSearchHistory,
+  applySavedSearch,
+  type SearchFilters,
+  type SavedSearch,
+} from './search'
+
+// Execution History
+export {
+  recordExecution,
+  getExecutionHistory,
+  getStatistics,
+  exportToJSON,
+  exportToCSV,
+  rerunExecution,
+  type ToolExecution,
+  type ExecutionStatistics,
+} from './execution-history'
+
+// Execution Tracking
+export {
+  trackToolExecution,
+  createTrackedTool,
+  batchTrackExecutions,
+} from './track-execution'
+
 /**
  * Quick start guide for using MCP in Zola
  * 
