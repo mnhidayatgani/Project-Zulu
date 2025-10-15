@@ -9,6 +9,10 @@ export const APP = {
   VERSION: '1.0.0',
 } as const
 
+// Individual exports for backward compatibility
+export const APP_NAME = APP.NAME
+export const APP_DOMAIN = APP.DOMAIN
+
 /**
  * Message and content limits
  */

@@ -99,7 +99,7 @@ export const SUGGESTIONS: Suggestion[] = [
     highlight: 'Explain',
     prompt: `Explain`,
     items: [
-      'Explain quantum physics like I'm 10',
+      'Explain quantum physics like I\'m 10',
       'Explain stoicism in simple terms',
       'Explain how a neural network works',
       'Explain the difference between AI and AGI',
