@@ -22,6 +22,19 @@ export interface MCPTransportConfig {
   env?: Record<string, string>
   /** URL for SSE/WebSocket transport */
   url?: string
+  /** WebSocket-specific options */
+  websocket?: {
+    /** Enable auto-reconnect */
+    reconnect?: boolean
+    /** Reconnect delay in ms */
+    reconnectDelay?: number
+    /** Maximum reconnection attempts */
+    maxReconnectAttempts?: number
+    /** Heartbeat interval in ms */
+    heartbeatInterval?: number
+    /** Connection timeout in ms */
+    connectionTimeout?: number
+  }
 }
 
 /**
@@ -148,3 +161,142 @@ export interface MCPError {
   toolName?: string
   originalError?: unknown
 }
+
+/**
+ * Tool Category types
+ */
+export type ToolCategoryType =
+  | 'file_operations'
+  | 'web_api'
+  | 'database'
+  | 'system'
+  | 'data_processing'
+  | 'ai_ml'
+  | 'text_documents'
+  | 'media_graphics'
+  | 'security'
+  | 'analytics'
+  | 'other'
+
+/**
+ * Tool Category definition
+ */
+export interface ToolCategory {
+  id: ToolCategoryType
+  name: string
+  description: string
+  icon: string
+  color: string
+}
+
+/**
+ * Enhanced Tool metadata with category
+ */
+export interface MCPToolMetadataEnhanced extends MCPToolMetadata {
+  /** Tool category */
+  category?: ToolCategoryType
+  /** Tool usage count */
+  usageCount?: number
+  /** Last used timestamp */
+  lastUsedAt?: Date
+  /** Success rate (0-1) */
+  successRate?: number
+}
+
+/**
+ * Tool usage analytics event
+ */
+export interface ToolUsageEvent {
+  /** Tool name */
+  toolName: string
+  /** Server ID */
+  serverId: string
+  /** When it was executed */
+  timestamp: Date
+  /** Execution time in ms */
+  executionTime: number
+  /** Whether it succeeded */
+  success: boolean
+  /** Error if failed */
+  error?: string
+  /** User ID (if authenticated) */
+  userId?: string
+}
+
+/**
+ * Server analytics
+ */
+export interface ServerAnalytics {
+  /** Server ID */
+  serverId: string
+  /** Total tool executions */
+  totalExecutions: number
+  /** Successful executions */
+  successfulExecutions: number
+  /** Failed executions */
+  failedExecutions: number
+  /** Average execution time in ms */
+  avgExecutionTime: number
+  /** Uptime percentage */
+  uptimePercentage: number
+  /** First connected at */
+  firstConnectedAt?: Date
+  /** Last active at */
+  lastActiveAt?: Date
+  /** Total connection time in ms */
+  totalConnectionTime: number
+  /** Connection failures */
+  connectionFailures: number
+}
+
+/**
+ * Tool analytics
+ */
+export interface ToolAnalytics {
+  /** Tool name */
+  toolName: string
+  /** Server ID */
+  serverId: string
+  /** Usage count */
+  usageCount: number
+  /** Success count */
+  successCount: number
+  /** Failure count */
+  failureCount: number
+  /** Average execution time */
+  avgExecutionTime: number
+  /** Success rate (0-1) */
+  successRate: number
+  /** First used */
+  firstUsedAt?: Date
+  /** Last used */
+  lastUsedAt?: Date
+  /** Category */
+  category?: ToolCategoryType
+}
+
+/**
+ * Analytics summary
+ */
+export interface AnalyticsSummary {
+  /** Total servers */
+  totalServers: number
+  /** Active servers */
+  activeServers: number
+  /** Total tools */
+  totalTools: number
+  /** Total executions */
+  totalExecutions: number
+  /** Overall success rate */
+  overallSuccessRate: number
+  /** Most popular tools */
+  popularTools: ToolAnalytics[]
+  /** Server health */
+  serverHealth: ServerAnalytics[]
+  /** Category distribution */
+  categoryDistribution: Record<ToolCategoryType, number>
+  /** Time period */
+  periodStart: Date
+  periodEnd: Date
+}
+

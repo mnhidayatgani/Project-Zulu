@@ -20,6 +20,13 @@ export type {
   MCPConfig,
   MCPErrorType,
   MCPError as MCPErrorInterface,
+  ToolCategoryType,
+  ToolCategory,
+  MCPToolMetadataEnhanced,
+  ToolUsageEvent,
+  ServerAnalytics,
+  ToolAnalytics,
+  AnalyticsSummary,
 } from './types'
 
 // Errors
@@ -67,6 +74,34 @@ export {
   loadMCPToolsFromURL,
   createMCPClientFromURL,
 } from './load-mcp-from-url'
+
+// Categories
+export {
+  TOOL_CATEGORIES,
+  getCategoryById,
+  getCategoryByName,
+  categorizeTool,
+  categorizeTools,
+  getCategoryDistribution,
+  filterToolsByCategory,
+  searchTools,
+  getPopularCategories,
+} from './categories'
+
+// Analytics
+export {
+  trackToolExecution,
+  trackServerConnection,
+  getToolAnalytics,
+  getServerAnalytics,
+  getAnalyticsSummary,
+  getPopularTools,
+  getToolSuccessRate,
+  exportAnalytics,
+  clearAnalytics,
+  getAnalyticsForPeriod,
+  analyticsStore,
+} from './analytics'
 
 /**
  * Quick start guide for using MCP in Zola
