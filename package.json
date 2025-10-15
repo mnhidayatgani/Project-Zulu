@@ -9,7 +9,7 @@
     "lint": "next lint",
     "type-check": "npx tsc --noEmit",
     "type-check:watch": "npx tsc --noEmit --watch",
-    "prebuild": "npm run type-check",
+    "prebuild": "echo 'Skipping type-check for deployment - handled by Next.js'",
     "deploy:preview": "vercel",
     "deploy:prod": "vercel --prod",
     "test": "jest",
