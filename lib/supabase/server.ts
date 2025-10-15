@@ -30,5 +30,5 @@ export const createClient = async (): Promise<TypedSupabaseClient | null> => {
         },
       },
     }
-  )
+  ) as unknown as TypedSupabaseClient
 }

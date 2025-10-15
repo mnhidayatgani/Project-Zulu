@@ -10,7 +10,7 @@ import { SupabaseClient } from "@supabase/supabase-js"
 
 type TypedSupabaseClient = SupabaseClient<Database, "public", any>
 
-const isFreeModel = (modelId: string) => FREE_MODELS_IDS.includes(modelId)
+const isFreeModel = (modelId: string) => (FREE_MODELS_IDS as readonly string[]).includes(modelId)
 const isProModel = (modelId: string) => !isFreeModel(modelId)
 
 /**

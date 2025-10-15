@@ -19,5 +19,5 @@ export async function createGuestServerClient(): Promise<TypedSupabaseClient | n
         setAll: () => {},
       },
     }
-  )
+  ) as unknown as TypedSupabaseClient
 }

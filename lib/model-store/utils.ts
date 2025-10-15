@@ -37,8 +37,8 @@ export function filterAndSortModels(
       }
 
       // Fallback to original sorting (free models first)
-      const aIsFree = FREE_MODELS_IDS.includes(a.id)
-      const bIsFree = FREE_MODELS_IDS.includes(b.id)
+      const aIsFree = (FREE_MODELS_IDS as readonly string[]).includes(a.id)
+      const bIsFree = (FREE_MODELS_IDS as readonly string[]).includes(b.id)
       return aIsFree === bIsFree ? 0 : aIsFree ? -1 : 1
     })
 }

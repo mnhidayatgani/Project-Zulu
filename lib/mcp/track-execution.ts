@@ -5,8 +5,8 @@
  * Use this in chat API routes for automatic tracking
  */
 
-import { recordExecution } from '@/lib/mcp/execution-history'
-import { incrementFavoriteUseCount, getFavoriteByTool } from '@/lib/mcp/favorites'
+import { startExecution, completeExecution } from '@/lib/mcp/execution-history'
+import { incrementUseCount, getFavorite } from '@/lib/mcp/favorites'
 
 /**
  * Wrap a tool execution with automatic tracking
@@ -54,22 +54,25 @@ export async function trackToolExecution<T>(params: {
 
     try {
       // Record to execution history
-      recordExecution({
-        toolName,
+      const executionId = startExecution(
         serverId,
         serverName,
+        toolName,
         input,
+        { tags }
+      )
+      
+      completeExecution(executionId, {
+        status,
         output: status === 'success' ? output : undefined,
         error,
-        duration,
-        status,
-        tags
+        duration
       })
 
       // Update favorites use count
-      const favorite = getFavoriteByTool(serverId, toolName)
+      const favorite = getFavorite(serverId, toolName)
       if (favorite) {
-        incrementFavoriteUseCount(favorite.id)
+        incrementUseCount(serverId, toolName)
       }
     } catch (trackingErr) {
       // Don't fail the tool execution if tracking fails
@@ -141,22 +144,25 @@ export async function batchTrackExecutions(executions: Array<{
 
   for (const execution of executions) {
     try {
-      recordExecution({
-        toolName: execution.toolName,
-        serverId: execution.serverId,
-        serverName: execution.serverName,
-        input: execution.input,
+      const executionId = startExecution(
+        execution.serverId,
+        execution.serverName,
+        execution.toolName,
+        execution.input,
+        { tags: execution.tags || [] }
+      )
+      
+      completeExecution(executionId, {
+        status: execution.status || 'success',
         output: execution.output,
         error: execution.error,
-        duration: execution.duration || 0,
-        status: execution.status || 'success',
-        tags: execution.tags || []
+        duration: execution.duration || 0
       })
 
       // Update favorites
-      const favorite = getFavoriteByTool(execution.serverId, execution.toolName)
+      const favorite = getFavorite(execution.serverId, execution.toolName)
       if (favorite) {
-        incrementFavoriteUseCount(favorite.id)
+        incrementUseCount(execution.serverId, execution.toolName)
       }
 
       results.success++

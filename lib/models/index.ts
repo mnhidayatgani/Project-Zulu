@@ -62,7 +62,7 @@ export async function getModelsWithAccessFlags(): Promise<ModelConfig[]> {
   const freeModels = models
     .filter(
       (model) =>
-        FREE_MODELS_IDS.includes(model.id) || model.providerId === "ollama"
+        (FREE_MODELS_IDS as readonly string[]).includes(model.id) || model.providerId === "ollama"
     )
     .map((model) => ({
       ...model,

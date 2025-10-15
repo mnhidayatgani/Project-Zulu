@@ -16,8 +16,8 @@ export const logger = pino({
 
 // Helper functions
 export const log = {
-  info: (msg: string, ...args: unknown[]) => logger.info(msg, ...args),
-  error: (msg: string, ...args: unknown[]) => logger.error(msg, ...args),
-  warn: (msg: string, ...args: unknown[]) => logger.warn(msg, ...args),
-  debug: (msg: string, ...args: unknown[]) => logger.debug(msg, ...args),
+  info: (msg: string, data?: unknown) => logger.info(data, msg),
+  error: (msg: string, data?: unknown) => logger.error(data, msg),
+  warn: (msg: string, data?: unknown) => logger.warn(data, msg),
+  debug: (msg: string, data?: unknown) => logger.debug(data, msg),
 }

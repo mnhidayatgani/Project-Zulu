@@ -57,6 +57,30 @@ export interface SyncStatus {
 export type SyncDirection = 'pull' | 'push' | 'bidirectional'
 
 /**
+ * Internal sync state
+ */
+interface SyncState {
+  autoSyncEnabled: boolean
+  lastSync?: Date
+}
+
+let syncState: SyncState | null = null
+
+/**
+ * Initialize sync state
+ */
+function initSyncState() {
+  if (!syncState) {
+    syncState = {
+      autoSyncEnabled: typeof window !== 'undefined' 
+        ? localStorage.getItem('mcp_auto_sync_enabled') !== 'false'
+        : true
+    }
+  }
+  return syncState
+}
+
+/**
  * Sync all data from Supabase to localStorage (PULL)
  * Use this when user logs in or switches devices
  */
@@ -483,31 +507,23 @@ export async function getSyncStats(): Promise<{
  * Enable or disable auto-sync
  */
 export async function setAutoSync(enabled: boolean): Promise<void> {
-  if (syncState) {
-    syncState.autoSyncEnabled = enabled
-    
-    // Save preference to localStorage
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('mcp_auto_sync_enabled', enabled ? 'true' : 'false')
-    }
-
-    console.log('Auto-sync', enabled ? 'enabled' : 'disabled')
+  const state = initSyncState()
+  state.autoSyncEnabled = enabled
+  
+  // Save preference to localStorage
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('mcp_auto_sync_enabled', enabled ? 'true' : 'false')
   }
+
+  console.log('Auto-sync', enabled ? 'enabled' : 'disabled')
 }
 
 /**
  * Check if auto-sync is enabled
  */
 export function isAutoSyncEnabled(): boolean {
-  if (syncState) {
-    return syncState.autoSyncEnabled
-  }
-
-  // Check localStorage
-  if (typeof window !== 'undefined') {
-    const stored = localStorage.getItem('mcp_auto_sync_enabled')
-    return stored !== 'false' // Default to true
-  }
+  const state = initSyncState()
+  return state.autoSyncEnabled
 
   return true
 }
