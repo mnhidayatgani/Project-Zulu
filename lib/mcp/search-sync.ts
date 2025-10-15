@@ -7,10 +7,10 @@
 import { createClient } from '@/lib/supabase/client'
 import type { SavedSearch, SearchFilters } from './search'
 import {
-  getSavedSearches as getLocalSavedSearches,
+  loadSavedSearches as getLocalSavedSearches,
   saveSearch as saveLocalSearch,
   deleteSavedSearch as deleteLocalSavedSearch,
-  getSearchHistory as getLocalSearchHistory,
+  loadSearchHistory as getLocalSearchHistory,
 } from './search'
 
 /**

@@ -6,10 +6,14 @@
 
 import { createClient } from '@/lib/supabase/client'
 import type { ToolExecution } from './execution-history'
+import type { ExecutionRecord } from './execution-history'
 import {
-  getExecutionHistory as getLocalHistory,
-  recordExecution as recordLocalExecution,
-  clearHistory as clearLocalHistory,
+  getRecentExecutions as getLocalHistory,
+  loadExecutionHistory,
+  saveExecutionHistory,
+  clearExecutionHistory as clearLocalHistory,
+  startExecution,
+  completeExecution,
 } from './execution-history'
 
 /**
@@ -160,8 +164,18 @@ export async function recordExecutionWithSync(
   execution: Omit<ToolExecution, 'id' | 'timestamp'>
 ): Promise<boolean> {
   try {
-    // Record locally first
-    const localExecution = recordLocalExecution(execution)
+    // Record locally first - start execution
+    const executionId = startExecution(
+      execution.tool_name,
+      execution.server_id,
+      execution.server_name,
+      execution.input
+    )
+    
+    // Complete with output if available
+    if (execution.output !== undefined || execution.error) {
+      completeExecution(executionId, execution.output || {}, execution.error, execution.status || 'success')
+    }
 
     // Sync to Supabase
     const supabase = createClient()
