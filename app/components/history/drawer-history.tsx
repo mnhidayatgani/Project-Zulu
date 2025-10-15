@@ -10,26 +10,21 @@ import {
 import { useChats } from "@/lib/chat-store/chats/provider"
 import { Chats } from "@/lib/chat-store/types"
 import {
-  Check,
   MagnifyingGlass,
   PencilSimple,
   TrashSimple,
-  X,
 } from "@phosphor-icons/react"
 import { Pin, PinOff } from "lucide-react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
-import React, { useCallback, useMemo, useState } from "react"
+import React, { useCallback, useMemo } from "react"
 import { formatDate, groupChatsByDate } from "./utils"
-
-type DrawerHistoryProps = {
-  chatHistory: Chats[]
-  onSaveEdit: (id: string, newTitle: string) => Promise<void>
-  onConfirmDelete: (id: string) => Promise<void>
-  trigger: React.ReactNode
-  isOpen: boolean
-  setIsOpen: (open: boolean) => void
-}
+import {
+  useHistoryActions,
+  HistoryItemEdit,
+  HistoryItemDelete,
+  type HistoryBaseProps,
+} from "./shared"
 
 export function DrawerHistory({
   chatHistory,
@@ -38,60 +33,40 @@ export function DrawerHistory({
   trigger,
   isOpen,
   setIsOpen,
-}: DrawerHistoryProps) {
+}: HistoryBaseProps) {
   const { pinnedChats, togglePinned } = useChats()
-  const [searchQuery, setSearchQuery] = useState("")
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [editTitle, setEditTitle] = useState("")
-  const [deletingId, setDeletingId] = useState<string | null>(null)
   const params = useParams<{ chatId: string }>()
+
+  // Use shared history actions hook
+  const {
+    searchQuery,
+    setSearchQuery,
+    editingId,
+    editTitle,
+    setEditTitle,
+    deletingId,
+    handleEdit,
+    handleSaveEdit,
+    handleCancelEdit,
+    handleDelete,
+    handleConfirmDelete,
+    handleCancelDelete,
+    resetStates,
+  } = useHistoryActions({
+    chatHistory,
+    onSaveEdit,
+    onConfirmDelete,
+  })
 
   const handleOpenChange = useCallback(
     (open: boolean) => {
       setIsOpen(open)
       if (!open) {
-        setSearchQuery("")
-        setEditingId(null)
-        setEditTitle("")
-        setDeletingId(null)
+        resetStates()
       }
     },
-    [setIsOpen]
+    [setIsOpen, resetStates]
   )
-
-  const handleEdit = useCallback((chat: Chats) => {
-    setEditingId(chat.id)
-    setEditTitle(chat.title || "")
-  }, [])
-
-  const handleSaveEdit = useCallback(
-    async (id: string) => {
-      setEditingId(null)
-      await onSaveEdit(id, editTitle)
-    },
-    [editTitle, onSaveEdit]
-  )
-
-  const handleCancelEdit = useCallback(() => {
-    setEditingId(null)
-    setEditTitle("")
-  }, [])
-
-  const handleDelete = useCallback((id: string) => {
-    setDeletingId(id)
-  }, [])
-
-  const handleConfirmDelete = useCallback(
-    async (id: string) => {
-      setDeletingId(null)
-      await onConfirmDelete(id)
-    },
-    [onConfirmDelete]
-  )
-
-  const handleCancelDelete = useCallback(() => {
-    setDeletingId(null)
-  }, [])
 
   // Memoize filtered chats to avoid recalculating on every render
   const filteredChat = useMemo(() => {
@@ -116,92 +91,21 @@ export function DrawerHistory({
         <div className="space-y-1.5">
           {editingId === chat.id ? (
             <div className="bg-accent flex items-center justify-between rounded-lg px-2 py-2.5">
-              <form
-                className="flex w-full items-center justify-between"
-                onSubmit={(e) => {
-                  e.preventDefault()
-                  handleSaveEdit(chat.id)
-                }}
-              >
-                <Input
-                  value={editTitle}
-                  onChange={(e) => setEditTitle(e.target.value)}
-                  className="h-8 flex-1"
-                  autoFocus
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault()
-                      handleSaveEdit(chat.id)
-                    }
-                  }}
-                />
-                <div className="ml-2 flex gap-1">
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="h-8 w-8"
-                    type="submit"
-                  >
-                    <Check className="size-4" />
-                  </Button>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="h-8 w-8"
-                    type="button"
-                    onClick={handleCancelEdit}
-                  >
-                    <X className="size-4" />
-                  </Button>
-                </div>
-              </form>
+              <HistoryItemEdit
+                chat={chat}
+                editTitle={editTitle}
+                setEditTitle={setEditTitle}
+                onSave={handleSaveEdit}
+                onCancel={handleCancelEdit}
+              />
             </div>
           ) : deletingId === chat.id ? (
             <div className="bg-accent flex items-center justify-between rounded-lg px-2 py-2.5">
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault()
-                  handleConfirmDelete(chat.id)
-                }}
-                className="flex w-full items-center justify-between"
-              >
-                <div className="flex flex-1 items-center">
-                  <span className="text-base font-normal">{chat.title}</span>
-                  <input
-                    type="text"
-                    className="sr-only"
-                    autoFocus
-                    onKeyDown={(e) => {
-                      if (e.key === "Escape") {
-                        e.preventDefault()
-                        handleCancelDelete()
-                      } else if (e.key === "Enter") {
-                        e.preventDefault()
-                        handleConfirmDelete(chat.id)
-                      }
-                    }}
-                  />
-                </div>
-                <div className="ml-2 flex gap-1">
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="text-muted-foreground hover:text-destructive size-8"
-                    type="submit"
-                  >
-                    <Check className="size-4" />
-                  </Button>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="text-muted-foreground hover:text-destructive size-8"
-                    onClick={handleCancelDelete}
-                    type="button"
-                  >
-                    <X className="size-4" />
-                  </Button>
-                </div>
-              </form>
+              <HistoryItemDelete
+                chat={chat}
+                onConfirm={handleConfirmDelete}
+                onCancel={handleCancelDelete}
+              />
             </div>
           ) : (
             <div
