@@ -17,6 +17,7 @@ import { MCPAnalyticsDashboard } from "./mcp-analytics-dashboard"
 import { MCPMarketplace } from "./mcp-marketplace"
 import { MCPExecutionHistory } from "./mcp-execution-history"
 import { MCPFavoritesBar } from "./mcp-favorites-bar"
+import { MCPSyncButton } from "./mcp-sync-button"
 import { Plugs, ListChecks, GridFour, ChartBar, ShoppingBag, ClockCounterClockwise } from "@phosphor-icons/react"
 import type { AnalyticsSummary, MCPToolMetadata } from "@/lib/mcp/types"
 import type { FavoriteTool } from "@/lib/mcp/favorites"
@@ -110,7 +111,10 @@ export function MCPManager() {
                 Manage Model Context Protocol servers to add custom tools to your AI chats
               </CardDescription>
             </div>
-            <MCPRegisterDialog onSuccess={handleSuccess} />
+            <div className="flex items-center gap-2">
+              <MCPSyncButton variant="ghost" size="sm" iconOnly />
+              <MCPRegisterDialog onSuccess={handleSuccess} />
+            </div>
           </div>
         </CardHeader>
         <CardContent>

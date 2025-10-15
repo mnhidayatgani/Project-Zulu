@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { isSupabaseEnabled } from "@/lib/supabase/config"
 import { cn, isDev } from "@/lib/utils"
 import {
+  CloudArrowUp,
   CubeIcon,
   GearSixIcon,
   KeyIcon,
@@ -60,6 +61,9 @@ const UserProfile = lazy(() =>
 const ModelsSettings = lazy(() =>
   import("./models/models-settings").then((m) => ({ default: m.ModelsSettings }))
 )
+const MCPSyncSettings = lazy(() =>
+  import("@/app/components/mcp").then((m) => ({ default: m.MCPSyncSettings }))
+)
 
 // Loading component for suspense fallback
 const TabLoading = () => (
@@ -72,7 +76,7 @@ type SettingsContentProps = {
   isDrawer?: boolean
 }
 
-type TabType = "general" | "appearance" | "models" | "connections"
+type TabType = "general" | "appearance" | "models" | "connections" | "sync"
 
 export function SettingsContent({
   isDrawer = false,
@@ -145,6 +149,15 @@ export function SettingsContent({
                   <PlugsConnectedIcon className="size-4" />
                   <span>Connections</span>
                 </TabsTrigger>
+                {isSupabaseEnabled && (
+                  <TabsTrigger
+                    value="sync"
+                    className="mr-6 flex shrink-0 items-center gap-2"
+                  >
+                    <CloudArrowUp className="size-4" />
+                    <span>Sync</span>
+                  </TabsTrigger>
+                )}
               </TabsList>
             </div>
 
@@ -188,6 +201,14 @@ export function SettingsContent({
                 {isDev && <DeveloperTools />}
               </Suspense>
             </TabsContent>
+
+            {isSupabaseEnabled && (
+              <TabsContent value="sync" className="space-y-6 px-6">
+                <Suspense fallback={<TabLoading />}>
+                  <MCPSyncSettings />
+                </Suspense>
+              </TabsContent>
+            )}
           </div>
         ) : (
           // Desktop version - tabs on left
@@ -241,6 +262,17 @@ export function SettingsContent({
                     <span>Connections</span>
                   </div>
                 </TabsTrigger>
+                {isSupabaseEnabled && (
+                  <TabsTrigger
+                    value="sync"
+                    className="w-full justify-start rounded-md px-3 py-2 text-left"
+                  >
+                    <div className="flex items-center gap-2">
+                      <CloudArrowUp className="size-4" />
+                      <span>Sync</span>
+                    </div>
+                  </TabsTrigger>
+                )}
               </div>
             </TabsList>
 
@@ -285,6 +317,14 @@ export function SettingsContent({
                   {isDev && <DeveloperTools />}
                 </Suspense>
               </TabsContent>
+
+              {isSupabaseEnabled && (
+                <TabsContent value="sync" className="mt-0 space-y-6">
+                  <Suspense fallback={<TabLoading />}>
+                    <MCPSyncSettings />
+                  </Suspense>
+                </TabsContent>
+              )}
             </div>
           </>
         )}

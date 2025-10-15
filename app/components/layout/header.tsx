@@ -4,10 +4,12 @@ import { HistoryTrigger } from "@/app/components/history/history-trigger"
 import { AppInfoTrigger } from "@/app/components/layout/app-info/app-info-trigger"
 import { ButtonNewChat } from "@/app/components/layout/button-new-chat"
 import { UserMenu } from "@/app/components/layout/user-menu"
+import { MCPSyncStatus } from "@/app/components/mcp"
 import { useBreakpoint } from "@/app/hooks/use-breakpoint"
 import { ZolaIcon } from "@/components/icons/zola"
 import { Button } from "@/components/ui/button"
 import { APP_NAME } from "@/lib/config"
+import { isSupabaseEnabled } from "@/lib/supabase/config"
 import { useUserPreferences } from "@/lib/user-preference-store/provider"
 import { useUser } from "@/lib/user-store/provider"
 import { Info } from "@phosphor-icons/react"
@@ -66,6 +68,7 @@ export function Header({ hasSidebar }: { hasSidebar: boolean }) {
               {!isMultiModelEnabled && <DialogPublish />}
               <ButtonNewChat />
               {!hasSidebar && <HistoryTrigger hasSidebar={hasSidebar} />}
+              {isSupabaseEnabled && <MCPSyncStatus compact />}
               <UserMenu />
             </div>
           )}
