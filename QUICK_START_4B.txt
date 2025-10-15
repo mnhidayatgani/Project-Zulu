@@ -1,0 +1,38 @@
+═══════════════════════════════════════════════════════════════
+🚀 QUICK START - PHASE 4B: UNIT TESTS
+═══════════════════════════════════════════════════════════════
+
+Copy this prompt to continue immediately:
+
+---
+
+Continue Phase 4B: Unit Tests
+
+Previous: Phase 4A ✅ Complete (testing infrastructure ready)
+Location: /root/zola
+Branch: refactor/foundation (26 commits)
+
+Phase 4B Tasks:
+1. Test utilities: encryption, file-handling, user-keys, csrf (15+ tests)
+2. Test hooks: 8 custom hooks in lib/hooks/ (8+ tests)  
+3. Test API client: lib/api/client.ts + resources/* (20+ tests)
+4. Test models: lib/models/index.ts (5+ tests)
+Target: 48+ tests total
+
+Setup Ready:
+- Jest configured ✅
+- Test utilities created ✅
+- 32 initial tests written ✅
+- Patterns documented ✅
+
+First Action: Verify setup with "npm test"
+Then: Write tests for lib/encryption.ts
+
+Reference: 
+- PHASE4_PLAN.md
+- docs/TESTING_PATTERNS.md
+- __tests__/utils/ (mocks & helpers)
+
+Start Phase 4B implementation.
+
+═══════════════════════════════════════════════════════════════
