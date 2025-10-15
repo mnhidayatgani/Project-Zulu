@@ -6,6 +6,20 @@ import { TextEncoder, TextDecoder } from 'util'
 global.TextEncoder = TextEncoder
 global.TextDecoder = TextDecoder
 
+// Polyfill React.act for React 19 - compatibility layer
+// React 19 moved act to a different location, but Testing Library expects it on React
+const React = require('react')
+const ReactDOM = require('react-dom')
+
+if (!React.act && ReactDOM && ReactDOM.act) {
+  React.act = ReactDOM.act
+}
+
+// Also add it to global for react-dom test utils compatibility
+if (typeof global.IS_REACT_ACT_ENVIRONMENT === 'undefined') {
+  global.IS_REACT_ACT_ENVIRONMENT = true
+}
+
 // Mock Next.js router
 jest.mock('next/navigation', () => ({
   useRouter() {
