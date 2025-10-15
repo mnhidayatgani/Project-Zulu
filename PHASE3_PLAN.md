@@ -5,15 +5,15 @@
 **Date Started**: October 15, 2025  
 **Phase 3A Completed**: October 15, 2025  
 **Phase 3B Started**: October 15, 2025  
-**Phase 3B - Sidebar Completed**: October 15, 2025  
+**Phase 3B Completed**: October 15, 2025  
 **Estimated Duration**: 5-7 hours  
 **Priority**: High
 
 **Progress**: 
 - ✅ Phase 3A: Quick Wins (Constants, Utilities, Hooks) - COMPLETED
 - ✅ Phase 3B.1: Sidebar Refactoring - COMPLETED
-- 🔄 Phase 3B.2: History Components - IN PROGRESS
-- ⏳ Phase 3B.3: Multi-Model Selector - PENDING
+- ✅ Phase 3B.2: History Components - COMPLETED
+- ⏳ Phase 3B.3: Multi-Model Selector - NEXT
 - ⏳ Phase 3C: API & Data Layer - PENDING
 - ⏳ Phase 3D: Performance & Optimization - PENDING
 
@@ -172,27 +172,48 @@ components/ui/sidebar/
 - [x] Maintain backward compatibility wrapper
 - [x] Verify type-checking passes
 
-#### 2. History Components (646 lines + 358 lines)
-**Current**: Two large history components with duplication
-**Target**: Shared logic, DRY components
+#### 2. History Components (646 lines + 358 lines) ✅ COMPLETED
+**Original**: Two large files with extensive code duplication
+- command-history.tsx (646 lines)
+- drawer-history.tsx (358 lines)
 
+**Refactored**: Shared logic extracted into reusable modules
+
+**New Structure**:
 ```
-components/features/history/
-├── CommandHistory.tsx
-├── DrawerHistory.tsx
-├── HistoryList.tsx (shared)
-├── HistoryItem.tsx (shared)
-├── hooks/
-│   ├── useHistoryData.ts (shared logic)
-│   └── useHistoryFilters.ts
-└── types.ts
+app/components/history/
+├── command-history.tsx (501 lines) - Desktop command palette
+├── drawer-history.tsx (262 lines) - Mobile drawer
+└── shared/
+    ├── index.ts - Centralized exports
+    ├── types.ts - Shared TypeScript types  
+    ├── use-history-actions.ts - Custom hook for CRUD operations
+    └── history-item-actions.tsx - Edit/Delete form components
 ```
 
-**Tasks**:
-- [ ] Extract shared list rendering
-- [ ] Create shared history item component
-- [ ] Extract data fetching logic to hook
-- [ ] Remove code duplication
+**Metrics**:
+- command-history.tsx: 646 → 501 lines (-145 / -22%)
+- drawer-history.tsx: 358 → 262 lines (-96 / -27%)
+- **Total reduction**: 241 lines of duplicate code eliminated
+- **Shared code**: ~305 lines in reusable modules
+
+**Benefits Achieved**:
+- ✅ Eliminated code duplication (DRY principle)
+- ✅ Consistent UI/UX across both variants
+- ✅ Easier maintenance - changes in one location
+- ✅ Better testability with isolated components
+- ✅ Type safety maintained 100%
+- ✅ Shared hook for common operations
+
+**Tasks Completed**:
+- [x] Create shared types file
+- [x] Extract common handlers to custom hook (useHistoryActions)
+- [x] Create shared edit form component (HistoryItemEdit)
+- [x] Create shared delete confirmation component (HistoryItemDelete)
+- [x] Refactor command-history to use shared components
+- [x] Refactor drawer-history to use shared components
+- [x] Create centralized exports (index.ts)
+- [x] Verify type-checking passes
 
 #### 3. Multi-Model Selector (525 lines)
 **Current**: Complex component with multiple concerns
