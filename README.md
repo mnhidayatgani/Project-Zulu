@@ -1,81 +1,173 @@
-# Zola
+# Project Zulu
 
-[zola.chat](https://zola.chat)
+> An enhanced, production-ready chat interface for all your AI models
 
-**Zola** is the open-source chat interface for all your models.
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-15-black)](https://nextjs.org/)
 
-![zola cover](./public/cover_zola.jpg)
+**Project Zulu** is an enhanced fork of [Zola](https://github.com/ibelick/zola), featuring improved stability, better authentication, comprehensive testing, and production-ready optimizations.
 
-## Features
+![Cover](./public/cover_zola.jpg)
 
-- Multi-model support: OpenAI, Mistral, Claude, Gemini, Ollama (local models)
-- Bring your own API key (BYOK) support via OpenRouter
-- File uploads
-- Clean, responsive UI with light/dark themes
-- Built with Tailwind CSS, shadcn/ui, and prompt-kit
-- Open-source and self-hostable
-- Customizable: user system prompt, multiple layout options
-- Local AI with Ollama: Run models locally with automatic model detection
-- Full MCP support (wip)
+---
 
-## Quick Start
+## ✨ What's New in This Fork
 
-### Option 1: With OpenAI (Cloud)
+### 🔐 Enhanced Authentication
+- ✅ Email/Password authentication
+- ✅ Google OAuth integration
+- ✅ Password reset functionality
+- ✅ Secure session management
+- ✅ Multi-provider support
+
+### 🐛 Bug Fixes & Stability
+- ✅ Fixed critical TypeScript errors
+- ✅ Improved error handling
+- ✅ Better loading states
+- ✅ Enhanced form validation
+
+### 📚 Better Documentation
+- ✅ Comprehensive setup guides
+- ✅ API documentation
+- ✅ Troubleshooting guides
+- ✅ Authentication tutorials
+
+### 🚀 Coming Soon
+- [ ] Comprehensive test coverage
+- [ ] Performance optimizations
+- [ ] Advanced AI features
+- [ ] Real-time collaboration
+- [ ] Chat export functionality
+- [ ] Voice input support
+
+---
+
+## 🎯 Features
+
+### Core Features (from Original)
+- **Multi-model support**: OpenAI, Mistral, Claude, Gemini, Ollama
+- **BYOK support**: Bring your own API key via OpenRouter
+- **File uploads**: Attach files to your conversations
+- **Clean UI**: Responsive design with light/dark themes
+- **Self-hostable**: Run on your own infrastructure
+- **Customizable**: User prompts, multiple layouts
+- **Local AI**: Run Ollama models locally
+
+### Enhanced Features (This Fork)
+- **Better Auth**: Multiple authentication methods
+- **Improved Stability**: Bug fixes and error handling
+- **Better DX**: Enhanced developer experience
+- **Production Ready**: Optimized for deployment
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Node.js 18+ 
+- npm or yarn
+- (Optional) Ollama for local models
+- (Optional) Supabase account for auth
+
+### Installation
 
 ```bash
-git clone https://github.com/ibelick/zola.git
-cd zola
+# Clone the repository
+git clone https://github.com/mnhidayatgani/Project Zulu.git
+cd Project Zulu
+
+# Install dependencies
 npm install
-echo "OPENAI_API_KEY=your-key" > .env.local
+
+# Setup environment variables
+cp .env.local.example .env.local
+# Edit .env.local with your configuration
+
+# Run development server
 npm run dev
 ```
 
-### Option 2: With Ollama (Local)
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+---
+
+## 📖 Documentation
+
+- **[Installation Guide](INSTALL.md)** - Complete setup instructions
+- **[Authentication Setup](AUTH_QUICK_START.md)** - Configure OAuth and email auth
+- **[Refactoring Plan](REFACTORING_PLAN.md)** - Development roadmap
+- **[Credits](CREDITS.md)** - Attribution and contributors
+
+---
+
+## 🛠️ Development
 
 ```bash
-# Install and start Ollama
-curl -fsSL https://ollama.ai/install.sh | sh
-ollama pull llama3.2  # or any model you prefer
-
-# Clone and run Zola
-git clone https://github.com/ibelick/zola.git
-cd zola
-npm install
+# Run development server
 npm run dev
+
+# Type checking
+npm run type-check
+
+# Build for production
+npm run build
+
+# Start production server
+npm start
 ```
 
-Zola will automatically detect your local Ollama models!
+---
 
-### Option 3: Docker with Ollama
+## 🤝 Contributing
 
-```bash
-git clone https://github.com/ibelick/zola.git
-cd zola
-docker-compose -f docker-compose.ollama.yml up
-```
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/ibelick/zola)
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-To unlock features like auth, file uploads, see [INSTALL.md](./INSTALL.md).
+---
 
-## Built with
+## 📜 License
 
-- [prompt-kit](https://prompt-kit.com/) — AI components
-- [shadcn/ui](https://ui.shadcn.com) — core components
-- [motion-primitives](https://motion-primitives.com) — animated components
-- [vercel ai sdk](https://vercel.com/blog/introducing-the-vercel-ai-sdk) — model integration, AI features
-- [supabase](https://supabase.com) — auth and storage
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
 
-## Sponsors
+### Attribution
 
-<a href="https://vercel.com/oss">
-  <img alt="Vercel OSS Program" src="https://vercel.com/oss/program-badge.svg" />
-</a>
+This project is a fork of [Zola](https://github.com/ibelick/zola) by Julien Thibeaut.
 
-## License
+**Original Project**: © Julien Thibeaut  
+**Enhancements**: © 2025 yat
 
-Apache License 2.0
+See [CREDITS.md](CREDITS.md) for detailed attribution.
 
-## Notes
+---
 
-This is a beta release. The codebase is evolving and may change.
+## 🙏 Acknowledgments
+
+- [Julien Thibeaut](https://github.com/ibelick) - Original Zola creator
+- All contributors to the original Zola project
+- The open-source community
+
+---
+
+## 📞 Contact
+
+**yat**
+- GitHub: [@mnhidayatgani](https://github.com/mnhidayatgani)
+- Email: mnhidayatgani@gmail.com
+
+**Project Link**: [https://github.com/mnhidayatgani/Project Zulu](https://github.com/mnhidayatgani/Project Zulu)
+
+---
+
+## ⭐ Star History
+
+If you find this project useful, please consider giving it a star!
+
+---
+
+**Built with ❤️ by yat**

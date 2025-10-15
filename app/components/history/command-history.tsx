@@ -18,7 +18,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
 import {
   Tooltip,
   TooltipContent,
@@ -30,37 +29,22 @@ import type { Chats } from "@/lib/chat-store/types"
 import { useChatPreview } from "@/lib/hooks/use-chat-preview"
 import { useUserPreferences } from "@/lib/user-preference-store/provider"
 import { cn } from "@/lib/utils"
-import { Check, PencilSimple, TrashSimple, X } from "@phosphor-icons/react"
+import { PencilSimple, TrashSimple } from "@phosphor-icons/react"
 import { Pin, PinOff } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useCallback, useMemo, useRef, useState } from "react"
 import { ChatPreviewPanel } from "./chat-preview-panel"
 import { CommandFooter } from "./command-footer"
 import { formatDate, groupChatsByDate } from "./utils"
+import {
+  HistoryItemEdit,
+  HistoryItemDelete,
+  type HistoryBaseProps,
+} from "./shared"
 
-type CommandHistoryProps = {
-  chatHistory: Chats[]
-  onSaveEdit: (id: string, newTitle: string) => Promise<void>
-  onConfirmDelete: (id: string) => Promise<void>
-  trigger: React.ReactNode
-  isOpen: boolean
-  setIsOpen: (open: boolean) => void
+type CommandHistoryProps = HistoryBaseProps & {
   onOpenChange?: (open: boolean) => void
   hasPopover?: boolean
-}
-
-type CommandItemEditProps = {
-  chat: Chats
-  editTitle: string
-  setEditTitle: (title: string) => void
-  onSave: (id: string) => void
-  onCancel: () => void
-}
-
-type CommandItemDeleteProps = {
-  chat: Chats
-  onConfirm: (id: string) => void
-  onCancel: () => void
 }
 
 type CommandItemRowProps = {
@@ -69,135 +53,6 @@ type CommandItemRowProps = {
   onDelete: (id: string) => void
   editingId: string | null
   deletingId: string | null
-}
-
-// Component for editing a chat item
-function CommandItemEdit({
-  chat,
-  editTitle,
-  setEditTitle,
-  onSave,
-  onCancel,
-}: CommandItemEditProps) {
-  return (
-    <form
-      className="flex w-full items-center justify-between"
-      onSubmit={(e) => {
-        e.preventDefault()
-        onSave(chat.id)
-      }}
-    >
-      <Input
-        value={editTitle}
-        onChange={(e) => setEditTitle(e.target.value)}
-        className="border-input h-8 flex-1 rounded border bg-transparent px-3 py-1 text-sm"
-        autoFocus
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            e.preventDefault()
-            onSave(chat.id)
-          }
-        }}
-      />
-      <div className="ml-2 flex gap-1">
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              size="icon"
-              variant="ghost"
-              className="group/edit-confirm text-muted-foreground hover:bg-primary/10 size-8 transition-colors duration-150"
-              type="submit"
-              aria-label="Confirm"
-            >
-              <Check className="group-hover/edit-confirm:text-primary size-4 transition-colors duration-150" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Confirm</TooltipContent>
-        </Tooltip>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              size="icon"
-              variant="ghost"
-              className="group/edit-cancel text-muted-foreground hover:bg-primary/10 size-8 transition-colors duration-150"
-              type="button"
-              onClick={onCancel}
-              aria-label="Cancel"
-            >
-              <X className="group-hover/edit-cancel:text-primary size-4 transition-colors duration-150" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Cancel</TooltipContent>
-        </Tooltip>
-      </div>
-    </form>
-  )
-}
-
-// Component for deleting a chat item
-function CommandItemDelete({
-  chat,
-  onConfirm,
-  onCancel,
-}: CommandItemDeleteProps) {
-  return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault()
-        onConfirm(chat.id)
-      }}
-      className="flex w-full items-center justify-between"
-    >
-      <div className="flex flex-1 items-center">
-        <span className="line-clamp-1 text-base font-normal">{chat.title}</span>
-        <input
-          type="text"
-          className="sr-only hidden"
-          autoFocus
-          onKeyDown={(e) => {
-            if (e.key === "Escape") {
-              e.preventDefault()
-              onCancel()
-            } else if (e.key === "Enter") {
-              e.preventDefault()
-              onConfirm(chat.id)
-            }
-          }}
-        />
-      </div>
-      <div className="ml-2 flex gap-1">
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              size="icon"
-              variant="ghost"
-              className="group/delete-confirm text-muted-foreground hover:text-destructive-foreground hover:bg-primary/10 size-8 transition-colors duration-150"
-              type="submit"
-              aria-label="Confirm"
-            >
-              <Check className="group-hover/delete-confirm:text-primary size-4 transition-colors duration-150" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Confirm</TooltipContent>
-        </Tooltip>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              size="icon"
-              variant="ghost"
-              className="group/delete-cancel text-muted-foreground hover:text-foreground hover:bg-primary/10 size-8 transition-colors duration-150"
-              onClick={onCancel}
-              type="button"
-              aria-label="Cancel"
-            >
-              <X className="group-hover/delete-cancel:text-primary size-4 transition-colors duration-150" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Cancel</TooltipContent>
-        </Tooltip>
-      </div>
-    </form>
-  )
 }
 
 // Component for displaying a normal chat row
@@ -511,7 +366,7 @@ export function CommandHistory({
           }}
         >
           {editingId === chat.id ? (
-            <CommandItemEdit
+            <HistoryItemEdit
               chat={chat}
               editTitle={editTitle}
               setEditTitle={setEditTitle}
@@ -519,7 +374,7 @@ export function CommandHistory({
               onCancel={handleCancelEdit}
             />
           ) : deletingId === chat.id ? (
-            <CommandItemDelete
+            <HistoryItemDelete
               chat={chat}
               onConfirm={handleConfirmDelete}
               onCancel={handleCancelDelete}

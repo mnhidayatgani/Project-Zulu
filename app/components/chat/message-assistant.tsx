@@ -8,7 +8,7 @@ import { useUserPreferences } from "@/lib/user-preference-store/provider"
 import { cn } from "@/lib/utils"
 import type { Message as MessageAISDK } from "@ai-sdk/react"
 import { ArrowClockwise, Check, Copy } from "@phosphor-icons/react"
-import { useCallback, useRef } from "react"
+import { memo, useCallback, useMemo, useRef } from "react"
 import { getSources } from "./get-sources"
 import { QuoteButton } from "./quote-button"
 import { Reasoning } from "./reasoning"
@@ -31,7 +31,7 @@ type MessageAssistantProps = {
   onQuote?: (text: string, messageId: string) => void
 }
 
-export function MessageAssistant({
+const MessageAssistantComponent = ({
   children,
   isLast,
   hasScrollAnchor,
@@ -43,39 +43,53 @@ export function MessageAssistant({
   className,
   messageId,
   onQuote,
-}: MessageAssistantProps) {
+}: MessageAssistantProps) => {
   const { preferences } = useUserPreferences()
-  const sources = getSources(parts)
-  const toolInvocationParts = parts?.filter(
-    (part) => part.type === "tool-invocation"
+  
+  // Memoize expensive computations
+  const sources = useMemo(() => getSources(parts), [parts])
+  
+  const toolInvocationParts = useMemo(
+    () => parts?.filter((part) => part.type === "tool-invocation"),
+    [parts]
   )
-  const reasoningParts = parts?.find((part) => part.type === "reasoning")
-  const contentNullOrEmpty = children === null || children === ""
-  const isLastStreaming = status === "streaming" && isLast
-  const searchImageResults =
-    parts
-      ?.filter(
-        (part) =>
+  
+  const reasoningParts = useMemo(
+    () => parts?.find((part) => part.type === "reasoning"),
+    [parts]
+  )
+  
+  const searchImageResults = useMemo(
+    () =>
+      parts
+        ?.filter(
+          (part) =>
+            part.type === "tool-invocation" &&
+            part.toolInvocation?.state === "result" &&
+            part.toolInvocation?.toolName === "imageSearch" &&
+            part.toolInvocation?.result?.content?.[0]?.type === "images"
+        )
+        .flatMap((part) =>
           part.type === "tool-invocation" &&
           part.toolInvocation?.state === "result" &&
           part.toolInvocation?.toolName === "imageSearch" &&
           part.toolInvocation?.result?.content?.[0]?.type === "images"
-      )
-      .flatMap((part) =>
-        part.type === "tool-invocation" &&
-        part.toolInvocation?.state === "result" &&
-        part.toolInvocation?.toolName === "imageSearch" &&
-        part.toolInvocation?.result?.content?.[0]?.type === "images"
-          ? (part.toolInvocation?.result?.content?.[0]?.results ?? [])
-          : []
-      ) ?? []
-
+            ? (part.toolInvocation?.result?.content?.[0]?.results ?? [])
+            : []
+        ) ?? [],
+    [parts]
+  )
+  
+  const contentNullOrEmpty = children === null || children === ""
+  const isLastStreaming = status === "streaming" && isLast
   const isQuoteEnabled = !preferences.multiModelEnabled
+  
   const messageRef = useRef<HTMLDivElement>(null)
   const { selectionInfo, clearSelection } = useAssistantMessageSelection(
     messageRef,
     isQuoteEnabled
   )
+  
   const handleQuoteBtnClick = useCallback(() => {
     if (selectionInfo && onQuote) {
       onQuote(selectionInfo.text, selectionInfo.messageId)
@@ -184,3 +198,19 @@ export function MessageAssistant({
     </Message>
   )
 }
+
+// Memoized export
+export const MessageAssistant = memo(MessageAssistantComponent, (prevProps, nextProps) => {
+  // Only re-render if essential props change
+  return (
+    prevProps.messageId === nextProps.messageId &&
+    prevProps.children === nextProps.children &&
+    prevProps.isLast === nextProps.isLast &&
+    prevProps.status === nextProps.status &&
+    prevProps.copied === nextProps.copied &&
+    prevProps.hasScrollAnchor === nextProps.hasScrollAnchor &&
+    JSON.stringify(prevProps.parts) === JSON.stringify(nextProps.parts)
+  )
+})
+
+MessageAssistant.displayName = "MessageAssistant"

@@ -2,6 +2,7 @@ import { SYSTEM_PROMPT_DEFAULT } from "@/lib/config"
 import { getAllModels } from "@/lib/models"
 import { getProviderForModel } from "@/lib/openproviders/provider-map"
 import type { ProviderWithoutOllama } from "@/lib/user-keys"
+import { getMCPRegistry, getMCPConfig, loadMCPConfigFromEnv } from "@/lib/mcp"
 import { Attachment } from "@ai-sdk/ui-utils"
 import { Message as MessageAISDK, streamText, ToolSet } from "ai"
 import {
@@ -89,11 +90,26 @@ export async function POST(req: Request) {
         undefined
     }
 
+    // Get MCP tools
+    let mcpTools: ToolSet = {}
+    try {
+      const config = getMCPConfig(loadMCPConfigFromEnv())
+      const registry = getMCPRegistry(config)
+      mcpTools = registry.getAllTools()
+      
+      if (Object.keys(mcpTools).length > 0) {
+        console.log(`Loaded ${Object.keys(mcpTools).length} MCP tools`)
+      }
+    } catch (error) {
+      console.warn('Failed to load MCP tools:', error)
+      // Continue without MCP tools if there's an error
+    }
+
     const result = streamText({
       model: modelConfig.apiSdk(apiKey, { enableSearch }),
       system: effectiveSystemPrompt,
       messages: messages,
-      tools: {} as ToolSet,
+      tools: mcpTools,
       maxSteps: 10,
       onError: (err: unknown) => {
         console.error("Streaming error occurred:", err)

@@ -1,6 +1,6 @@
 import { useChatDraft } from "@/app/hooks/use-chat-draft"
 import { toast } from "@/components/ui/toast"
-import { getOrCreateGuestUserId } from "@/lib/api"
+import { getOrCreateGuestUserId } from "@/lib/legacy-api"
 import { MESSAGE_MAX_LENGTH, SYSTEM_PROMPT_DEFAULT } from "@/lib/config"
 import { Attachment } from "@/lib/file-handling"
 import { API_ROUTE_CHAT } from "@/lib/routes"

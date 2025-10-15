@@ -1,11 +1,14 @@
-import { UsageLimitError } from "@/lib/api"
+import { UsageLimitError } from "@/lib/legacy-api"
 import {
   AUTH_DAILY_MESSAGE_LIMIT,
   DAILY_LIMIT_PRO_MODELS,
   FREE_MODELS_IDS,
   NON_AUTH_DAILY_MESSAGE_LIMIT,
 } from "@/lib/config"
+import { Database } from "@/app/types/database.types"
 import { SupabaseClient } from "@supabase/supabase-js"
+
+type TypedSupabaseClient = SupabaseClient<Database, "public", any>
 
 const isFreeModel = (modelId: string) => FREE_MODELS_IDS.includes(modelId)
 const isProModel = (modelId: string) => !isFreeModel(modelId)
@@ -20,7 +23,7 @@ const isProModel = (modelId: string) => !isFreeModel(modelId)
  * @throws UsageLimitError if the daily limit is reached, or a generic Error if checking fails.
  * @returns User data including message counts and reset date
  */
-export async function checkUsage(supabase: SupabaseClient, userId: string) {
+export async function checkUsage(supabase: TypedSupabaseClient, userId: string) {
   const { data: userData, error: userDataError } = await supabase
     .from("users")
     .select(
@@ -88,7 +91,7 @@ export async function checkUsage(supabase: SupabaseClient, userId: string) {
  * @throws Error if updating fails.
  */
 export async function incrementUsage(
-  supabase: SupabaseClient,
+  supabase: TypedSupabaseClient,
   userId: string
 ): Promise<void> {
   const { data: userData, error: userDataError } = await supabase
@@ -125,7 +128,7 @@ export async function incrementUsage(
   }
 }
 
-export async function checkProUsage(supabase: SupabaseClient, userId: string) {
+export async function checkProUsage(supabase: TypedSupabaseClient, userId: string) {
   const { data: userData, error: userDataError } = await supabase
     .from("users")
     .select("daily_pro_message_count, daily_pro_reset")
@@ -177,7 +180,7 @@ export async function checkProUsage(supabase: SupabaseClient, userId: string) {
 }
 
 export async function incrementProUsage(
-  supabase: SupabaseClient,
+  supabase: TypedSupabaseClient,
   userId: string
 ) {
   const { data, error } = await supabase
@@ -206,7 +209,7 @@ export async function incrementProUsage(
 }
 
 export async function checkUsageByModel(
-  supabase: SupabaseClient,
+  supabase: TypedSupabaseClient,
   userId: string,
   modelId: string,
   isAuthenticated: boolean
@@ -222,7 +225,7 @@ export async function checkUsageByModel(
 }
 
 export async function incrementUsageByModel(
-  supabase: SupabaseClient,
+  supabase: TypedSupabaseClient,
   userId: string,
   modelId: string,
   isAuthenticated: boolean

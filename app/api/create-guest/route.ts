@@ -1,4 +1,6 @@
+import { Database } from "@/app/types/database.types"
 import { createGuestServerClient } from "@/lib/supabase/server-guest"
+import { logger } from "@/lib/logger"
 
 export async function POST(request: Request) {
   try {
@@ -12,7 +14,7 @@ export async function POST(request: Request) {
 
     const supabase = await createGuestServerClient()
     if (!supabase) {
-      console.log("Supabase not enabled, skipping guest creation.")
+      logger.info("Supabase not enabled, skipping guest creation.")
       return new Response(
         JSON.stringify({ user: { id: userId, anonymous: true } }),
         {
@@ -29,21 +31,23 @@ export async function POST(request: Request) {
       .maybeSingle()
 
     if (!userData) {
+      const insertData: Database["public"]["Tables"]["users"]["Insert"] = {
+        id: userId,
+        email: `${userId}@anonymous.example`,
+        anonymous: true,
+        message_count: 0,
+        premium: false,
+        created_at: new Date().toISOString(),
+      }
+      
       const { data, error } = await supabase
         .from("users")
-        .insert({
-          id: userId,
-          email: `${userId}@anonymous.example`,
-          anonymous: true,
-          message_count: 0,
-          premium: false,
-          created_at: new Date().toISOString(),
-        })
+        .insert(insertData)
         .select("*")
         .single()
 
       if (error || !data) {
-        console.error("Error creating guest user:", error)
+        logger.error({ error, userId }, "Error creating guest user")
         return new Response(
           JSON.stringify({
             error: "Failed to create guest user",
@@ -58,7 +62,7 @@ export async function POST(request: Request) {
 
     return new Response(JSON.stringify({ user: userData }), { status: 200 })
   } catch (err: unknown) {
-    console.error("Error in create-guest endpoint:", err)
+    logger.error({ err }, "Error in create-guest endpoint")
 
     return new Response(
       JSON.stringify({ error: (err as Error).message || "Internal server error" }),

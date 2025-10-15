@@ -1,6 +1,7 @@
 import { PROVIDERS } from "@/lib/providers"
 import { createClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
+import { logger } from "@/lib/logger"
 
 const SUPPORTED_PROVIDERS = PROVIDERS.map((p) => p.id)
 
@@ -41,7 +42,7 @@ export async function GET() {
 
     return NextResponse.json(providerStatus)
   } catch (err) {
-    console.error("Key status error:", err)
+    logger.error({ err }, "Key status error")
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

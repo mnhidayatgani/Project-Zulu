@@ -43,14 +43,16 @@ export async function POST(request: NextRequest) {
     }
 
     // Update the user's favorite models
+    const updateData: Database["public"]["Tables"]["users"]["Update"] = {
+      favorite_models,
+    }
+    
     const { data, error } = await supabase
       .from("users")
-      .update({
-        favorite_models,
-      })
+      .update(updateData)
       .eq("id", user.id)
       .select("favorite_models")
-      .single()
+      .single<{ favorite_models: string[] | null }>()
 
     if (error) {
       console.error("Error updating favorite models:", error)
@@ -99,7 +101,7 @@ export async function GET() {
       .from("users")
       .select("favorite_models")
       .eq("id", user.id)
-      .single()
+      .single<{ favorite_models: string[] | null }>()
 
     if (error) {
       console.error("Error fetching favorite models:", error)

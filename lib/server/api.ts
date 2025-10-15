@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server"
+import { createClient, type TypedSupabaseClient } from "@/lib/supabase/server"
 import { createGuestServerClient } from "@/lib/supabase/server-guest"
 import { isSupabaseEnabled } from "../supabase/config"
 
@@ -11,7 +11,7 @@ import { isSupabaseEnabled } from "../supabase/config"
 export async function validateUserIdentity(
   userId: string,
   isAuthenticated: boolean
-) {
+): Promise<TypedSupabaseClient | null> {
   if (!isSupabaseEnabled) {
     return null
   }

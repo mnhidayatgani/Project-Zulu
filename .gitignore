@@ -52,3 +52,7 @@ bun.lockb
 bun.lock
 
 /.cursor
+
+# agent memory (optional - uncomment to exclude from git)
+# .agent-memory/sessions.json
+# .agent-memory/file-modifications.json

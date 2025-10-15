@@ -1,5 +1,7 @@
+import { Database } from "@/app/types/database.types"
 import { createClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
+import { logger } from "@/lib/logger"
 
 export async function POST(request: Request) {
   try {
@@ -17,7 +19,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true }, { status: 200 })
     }
 
-    const toggle = pinned
+    const toggle: Database["public"]["Tables"]["chats"]["Update"] = pinned
       ? { pinned: true, pinned_at: new Date().toISOString() }
       : { pinned: false, pinned_at: null }
 
@@ -35,7 +37,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true }, { status: 200 })
   } catch (error) {
-    console.error("toggle-chat-pin unhandled error:", error)
+    logger.error({ error }, "toggle-chat-pin unhandled error")
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

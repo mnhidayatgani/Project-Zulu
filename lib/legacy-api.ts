@@ -1,33 +1,22 @@
 import { APP_DOMAIN } from "@/lib/config"
 import type { UserProfile } from "@/lib/user/types"
 import { SupabaseClient } from "@supabase/supabase-js"
-import { fetchClient } from "./fetch"
-import { API_ROUTE_CREATE_GUEST, API_ROUTE_UPDATE_CHAT_MODEL } from "./routes"
 import { createClient } from "./supabase/client"
+import { api } from "./api"
 
 /**
  * Creates a guest user record on the server
+ * @deprecated Use api.user.createGuestUser() instead
  */
 export async function createGuestUser(guestId: string) {
-  try {
-    const res = await fetchClient(API_ROUTE_CREATE_GUEST, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId: guestId }),
-    })
-    const responseData = await res.json()
-    if (!res.ok) {
-      throw new Error(
-        responseData.error ||
-          `Failed to create guest user: ${res.status} ${res.statusText}`
-      )
-    }
-
-    return responseData
-  } catch (err) {
-    console.error("Error creating guest user:", err)
-    throw err
+  const result = await api.user.createGuestUser(guestId)
+  
+  if (!result.success) {
+    console.error("Error creating guest user:", result.error)
+    throw new Error(result.error?.message || "Failed to create guest user")
   }
+
+  return result.data
 }
 
 export class UsageLimitError extends Error {
@@ -43,60 +32,38 @@ export class UsageLimitError extends Error {
  * Resets the daily counter if a new day (UTC) is detected.
  * Uses the `anonymous` flag from the user record to decide which daily limit applies.
  *
- * @param supabase - Your Supabase client.
  * @param userId - The ID of the user.
+ * @param isAuthenticated - Whether the user is authenticated.
  * @returns The remaining daily limit.
+ * @deprecated Use api.user.checkRateLimits() instead
  */
 export async function checkRateLimits(
   userId: string,
   isAuthenticated: boolean
 ) {
-  try {
-    const res = await fetchClient(
-      `/api/rate-limits?userId=${userId}&isAuthenticated=${isAuthenticated}`,
-      {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-      }
-    )
-    const responseData = await res.json()
-    if (!res.ok) {
-      throw new Error(
-        responseData.error ||
-          `Failed to check rate limits: ${res.status} ${res.statusText}`
-      )
-    }
-    return responseData
-  } catch (err) {
-    console.error("Error checking rate limits:", err)
-    throw err
+  const result = await api.user.checkRateLimits(userId, isAuthenticated)
+  
+  if (!result.success || !result.data) {
+    console.error("Error checking rate limits:", result.error)
+    throw new Error(result.error?.message || "Failed to check rate limits")
   }
+
+  return result.data
 }
 
 /**
  * Updates the model for an existing chat
+ * @deprecated Use api.chat.updateChatModel() instead
  */
 export async function updateChatModel(chatId: string, model: string) {
-  try {
-    const res = await fetchClient(API_ROUTE_UPDATE_CHAT_MODEL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chatId, model }),
-    })
-    const responseData = await res.json()
+  const result = await api.chat.updateChatModel(chatId, model)
 
-    if (!res.ok) {
-      throw new Error(
-        responseData.error ||
-          `Failed to update chat model: ${res.status} ${res.statusText}`
-      )
-    }
-
-    return responseData
-  } catch (error) {
-    console.error("Error updating chat model:", error)
-    throw error
+  if (!result.success) {
+    console.error("Error updating chat model:", result.error)
+    throw new Error(result.error?.message || "Failed to update chat model")
   }
+
+  return result.data
 }
 
 /**
@@ -134,6 +101,97 @@ export async function signInWithGoogle(supabase: SupabaseClient) {
     return data
   } catch (err) {
     console.error("Error signing in with Google:", err)
+    throw err
+  }
+}
+
+/**
+ * Signs in user with email and password
+ */
+export async function signInWithEmail(
+  supabase: SupabaseClient,
+  email: string,
+  password: string
+) {
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
+
+    if (error) {
+      throw error
+    }
+
+    return data
+  } catch (err) {
+    console.error("Error signing in with email:", err)
+    throw err
+  }
+}
+
+/**
+ * Signs up user with email and password
+ */
+export async function signUpWithEmail(
+  supabase: SupabaseClient,
+  email: string,
+  password: string
+) {
+  try {
+    const isDev = process.env.NODE_ENV === "development"
+    const baseUrl = isDev
+      ? "http://localhost:3000"
+      : typeof window !== "undefined"
+        ? window.location.origin
+        : process.env.NEXT_PUBLIC_VERCEL_URL
+          ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+          : APP_DOMAIN
+
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${baseUrl}/auth/callback`,
+      },
+    })
+
+    if (error) {
+      throw error
+    }
+
+    return data
+  } catch (err) {
+    console.error("Error signing up with email:", err)
+    throw err
+  }
+}
+
+/**
+ * Sends password reset email
+ */
+export async function resetPassword(supabase: SupabaseClient, email: string) {
+  try {
+    const isDev = process.env.NODE_ENV === "development"
+    const baseUrl = isDev
+      ? "http://localhost:3000"
+      : typeof window !== "undefined"
+        ? window.location.origin
+        : process.env.NEXT_PUBLIC_VERCEL_URL
+          ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+          : APP_DOMAIN
+
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${baseUrl}/auth/reset-password`,
+    })
+
+    if (error) {
+      throw error
+    }
+
+    return data
+  } catch (err) {
+    console.error("Error resetting password:", err)
     throw err
   }
 }

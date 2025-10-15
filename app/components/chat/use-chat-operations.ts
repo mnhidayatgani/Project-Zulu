@@ -1,5 +1,5 @@
 import { toast } from "@/components/ui/toast"
-import { checkRateLimits } from "@/lib/api"
+import { checkRateLimits } from "@/lib/legacy-api"
 import type { Chats } from "@/lib/chat-store/types"
 import { REMAINING_QUERY_ALERT_THRESHOLD } from "@/lib/config"
 import { Message } from "@ai-sdk/react"

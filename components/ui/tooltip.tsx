@@ -25,8 +25,11 @@ function Tooltip({
 }
 
 function TooltipTrigger({
+  disabled,
   ...props
 }: React.ComponentProps<typeof TooltipPrimitive.Trigger>) {
+  // Don't pass disabled prop to avoid hydration mismatch
+  // Let the child button handle its own disabled state
   return <TooltipPrimitive.Trigger data-slot="tooltip-trigger" {...props} />
 }
 

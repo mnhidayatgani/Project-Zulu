@@ -1,5 +1,7 @@
+import { Database } from "@/app/types/database.types"
 import { validateUserIdentity } from "@/lib/server/api"
 import { checkUsageByModel } from "@/lib/usage"
+import { logger } from "@/lib/logger"
 
 type CreateChatInput = {
   userId: string
@@ -30,19 +32,11 @@ export async function createChatInDb({
 
   await checkUsageByModel(supabase, userId, model, isAuthenticated)
 
-  const insertData: {
-    user_id: string
-    title: string
-    model: string
-    project_id?: string
-  } = {
+  const insertData: Database["public"]["Tables"]["chats"]["Insert"] = {
     user_id: userId,
     title: title || "New Chat",
     model,
-  }
-
-  if (projectId) {
-    insertData.project_id = projectId
+    project_id: projectId,
   }
 
   const { data, error } = await supabase
@@ -52,7 +46,7 @@ export async function createChatInDb({
     .single()
 
   if (error || !data) {
-    console.error("Error creating chat:", error)
+    logger.error({ error, userId }, "Error creating chat")
     return null
   }
 

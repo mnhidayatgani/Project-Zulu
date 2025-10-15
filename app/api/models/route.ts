@@ -6,6 +6,7 @@ import {
 } from "@/lib/models"
 import { createClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
+import { logger } from "@/lib/logger"
 
 export async function GET() {
   try {
@@ -43,7 +44,7 @@ export async function GET() {
       .eq("user_id", authData.user.id)
 
     if (error) {
-      console.error("Error fetching user keys:", error)
+      logger.error({ error }, "Error fetching user keys")
       const models = await getModelsWithAccessFlags()
       return new Response(JSON.stringify({ models }), {
         status: 200,
@@ -74,7 +75,7 @@ export async function GET() {
       },
     })
   } catch (error) {
-    console.error("Error fetching models:", error)
+    logger.error({ error }, "Error fetching models")
     return new Response(JSON.stringify({ error: "Failed to fetch models" }), {
       status: 500,
       headers: {
@@ -96,7 +97,7 @@ export async function POST() {
       count: models.length,
     })
   } catch (error) {
-    console.error("Failed to refresh models:", error)
+    logger.error({ error }, "Failed to refresh models")
     return NextResponse.json(
       { error: "Failed to refresh models" },
       { status: 500 }

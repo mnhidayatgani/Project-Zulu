@@ -1,6 +1,6 @@
 "use client"
 
-import { motion } from "framer-motion"
+import { motion, type Transition } from "framer-motion"
 
 // Style constants
 const DOT_SIZE = "size-2"
@@ -19,9 +19,9 @@ const ANIMATION = {
   opacity: [1, 0.7, 1],
 }
 
-const TRANSITION = {
+const TRANSITION: Transition = {
   duration: ANIMATION_DURATION,
-  ease: "easeInOut",
+  ease: [0.42, 0, 0.58, 1], // easeInOut cubic-bezier
   repeat: Number.POSITIVE_INFINITY,
   repeatType: "loop" as const,
 }
