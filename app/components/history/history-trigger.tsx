@@ -7,9 +7,22 @@ import { useChatSession } from "@/lib/chat-store/session/provider"
 import { cn } from "@/lib/utils"
 import { ListMagnifyingGlass } from "@phosphor-icons/react"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
-import { CommandHistory } from "./command-history"
-import { DrawerHistory } from "./drawer-history"
+import { lazy, Suspense, useState } from "react"
+
+// Lazy load heavy history components
+const CommandHistory = lazy(() =>
+  import("./command-history").then((m) => ({ default: m.CommandHistory }))
+)
+const DrawerHistory = lazy(() =>
+  import("./drawer-history").then((m) => ({ default: m.DrawerHistory }))
+)
+
+// Loading fallback
+const HistoryLoading = () => (
+  <div className="flex items-center justify-center p-4">
+    <div className="text-muted-foreground text-sm">Loading...</div>
+  </div>
+)
 
 type HistoryTriggerProps = {
   hasSidebar: boolean
@@ -64,27 +77,31 @@ export function HistoryTrigger({
 
   if (isMobile) {
     return (
-      <DrawerHistory
+      <Suspense fallback={<HistoryLoading />}>
+        <DrawerHistory
+          chatHistory={chats}
+          onSaveEdit={handleSaveEdit}
+          onConfirmDelete={handleConfirmDelete}
+          trigger={defaultTrigger}
+          isOpen={isOpen}
+          setIsOpen={setIsOpen}
+        />
+      </Suspense>
+    )
+  }
+
+  return (
+    <Suspense fallback={<HistoryLoading />}>
+      <CommandHistory
         chatHistory={chats}
         onSaveEdit={handleSaveEdit}
         onConfirmDelete={handleConfirmDelete}
         trigger={defaultTrigger}
         isOpen={isOpen}
         setIsOpen={setIsOpen}
+        onOpenChange={setIsOpen}
+        hasPopover={hasPopover}
       />
-    )
-  }
-
-  return (
-    <CommandHistory
-      chatHistory={chats}
-      onSaveEdit={handleSaveEdit}
-      onConfirmDelete={handleConfirmDelete}
-      trigger={defaultTrigger}
-      isOpen={isOpen}
-      setIsOpen={setIsOpen}
-      onOpenChange={setIsOpen}
-      hasPopover={hasPopover}
-    />
+    </Suspense>
   )
 }

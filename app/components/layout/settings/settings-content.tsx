@@ -13,17 +13,60 @@ import {
   PlugsConnectedIcon,
   XIcon,
 } from "@phosphor-icons/react"
-import { useState } from "react"
-import { ByokSection } from "./apikeys/byok-section"
-import { InteractionPreferences } from "./appearance/interaction-preferences"
-import { LayoutSettings } from "./appearance/layout-settings"
-import { ThemeSelection } from "./appearance/theme-selection"
-import { ConnectionsPlaceholder } from "./connections/connections-placeholder"
-import { DeveloperTools } from "./connections/developer-tools"
-import { OllamaSection } from "./connections/ollama-section"
-import { AccountManagement } from "./general/account-management"
-import { UserProfile } from "./general/user-profile"
-import { ModelsSettings } from "./models/models-settings"
+import { lazy, Suspense, useState } from "react"
+
+// Lazy load heavy settings components
+const ByokSection = lazy(() =>
+  import("./apikeys/byok-section").then((m) => ({ default: m.ByokSection }))
+)
+const InteractionPreferences = lazy(() =>
+  import("./appearance/interaction-preferences").then((m) => ({
+    default: m.InteractionPreferences,
+  }))
+)
+const LayoutSettings = lazy(() =>
+  import("./appearance/layout-settings").then((m) => ({
+    default: m.LayoutSettings,
+  }))
+)
+const ThemeSelection = lazy(() =>
+  import("./appearance/theme-selection").then((m) => ({
+    default: m.ThemeSelection,
+  }))
+)
+const ConnectionsPlaceholder = lazy(() =>
+  import("./connections/connections-placeholder").then((m) => ({
+    default: m.ConnectionsPlaceholder,
+  }))
+)
+const DeveloperTools = lazy(() =>
+  import("./connections/developer-tools").then((m) => ({
+    default: m.DeveloperTools,
+  }))
+)
+const OllamaSection = lazy(() =>
+  import("./connections/ollama-section").then((m) => ({
+    default: m.OllamaSection,
+  }))
+)
+const AccountManagement = lazy(() =>
+  import("./general/account-management").then((m) => ({
+    default: m.AccountManagement,
+  }))
+)
+const UserProfile = lazy(() =>
+  import("./general/user-profile").then((m) => ({ default: m.UserProfile }))
+)
+const ModelsSettings = lazy(() =>
+  import("./models/models-settings").then((m) => ({ default: m.ModelsSettings }))
+)
+
+// Loading component for suspense fallback
+const TabLoading = () => (
+  <div className="flex items-center justify-center p-8">
+    <div className="text-muted-foreground text-sm">Loading...</div>
+  </div>
+)
 
 type SettingsContentProps = {
   isDrawer?: boolean
@@ -107,33 +150,43 @@ export function SettingsContent({
 
             {/* Mobile tabs content */}
             <TabsContent value="general" className="space-y-6 px-6">
-              <UserProfile />
-              {isSupabaseEnabled && (
-                <>
-                  <AccountManagement />
-                </>
-              )}
+              <Suspense fallback={<TabLoading />}>
+                <UserProfile />
+                {isSupabaseEnabled && (
+                  <>
+                    <AccountManagement />
+                  </>
+                )}
+              </Suspense>
             </TabsContent>
 
             <TabsContent value="appearance" className="space-y-6 px-6">
-              <ThemeSelection />
-              <LayoutSettings />
-              <InteractionPreferences />
+              <Suspense fallback={<TabLoading />}>
+                <ThemeSelection />
+                <LayoutSettings />
+                <InteractionPreferences />
+              </Suspense>
             </TabsContent>
 
             <TabsContent value="apikeys" className="px-6">
-              <ByokSection />
+              <Suspense fallback={<TabLoading />}>
+                <ByokSection />
+              </Suspense>
             </TabsContent>
 
             <TabsContent value="models" className="px-6">
-              <ModelsSettings />
-              {/* <ModelVisibilitySettings /> */}
+              <Suspense fallback={<TabLoading />}>
+                <ModelsSettings />
+                {/* <ModelVisibilitySettings /> */}
+              </Suspense>
             </TabsContent>
 
             <TabsContent value="connections" className="space-y-6 px-6">
-              {!isDev && <ConnectionsPlaceholder />}
-              {isDev && <OllamaSection />}
-              {isDev && <DeveloperTools />}
+              <Suspense fallback={<TabLoading />}>
+                {!isDev && <ConnectionsPlaceholder />}
+                {isDev && <OllamaSection />}
+                {isDev && <DeveloperTools />}
+              </Suspense>
             </TabsContent>
           </div>
         ) : (
@@ -194,33 +247,43 @@ export function SettingsContent({
             {/* Desktop tabs content */}
             <div className="flex-1 overflow-auto px-6 pt-4">
               <TabsContent value="general" className="mt-0 space-y-6">
-                <UserProfile />
-                {isSupabaseEnabled && (
-                  <>
-                    <AccountManagement />
-                  </>
-                )}
+                <Suspense fallback={<TabLoading />}>
+                  <UserProfile />
+                  {isSupabaseEnabled && (
+                    <>
+                      <AccountManagement />
+                    </>
+                  )}
+                </Suspense>
               </TabsContent>
 
               <TabsContent value="appearance" className="mt-0 space-y-6">
-                <ThemeSelection />
-                <LayoutSettings />
-                <InteractionPreferences />
+                <Suspense fallback={<TabLoading />}>
+                  <ThemeSelection />
+                  <LayoutSettings />
+                  <InteractionPreferences />
+                </Suspense>
               </TabsContent>
 
               <TabsContent value="apikeys" className="mt-0 space-y-6">
-                <ByokSection />
+                <Suspense fallback={<TabLoading />}>
+                  <ByokSection />
+                </Suspense>
               </TabsContent>
 
               <TabsContent value="models" className="mt-0 space-y-6">
-                <ModelsSettings />
-                {/* <ModelVisibilitySettings /> */}
+                <Suspense fallback={<TabLoading />}>
+                  <ModelsSettings />
+                  {/* <ModelVisibilitySettings /> */}
+                </Suspense>
               </TabsContent>
 
               <TabsContent value="connections" className="mt-0 space-y-6">
-                {!isDev && <ConnectionsPlaceholder />}
-                {isDev && <OllamaSection />}
-                {isDev && <DeveloperTools />}
+                <Suspense fallback={<TabLoading />}>
+                  {!isDev && <ConnectionsPlaceholder />}
+                  {isDev && <OllamaSection />}
+                  {isDev && <DeveloperTools />}
+                </Suspense>
               </TabsContent>
             </div>
           </>
