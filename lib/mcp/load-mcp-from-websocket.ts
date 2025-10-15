@@ -2,37 +2,17 @@
  * WebSocket MCP Client Loader
  * 
  * Load MCP tools from a WebSocket-based MCP server
- * Note: This is a simplified implementation. Full WebSocket MCP support
- * requires the MCP server to implement WebSocket transport protocol.
+ * Full implementation with JSON-RPC 2.0 over WebSocket
  */
 
 import type { MCPServerConfig, MCPToolMetadata } from './types'
-import { MCPConnectionError, MCPTimeoutError } from './errors'
-
-/**
- * WebSocket connection state
- */
-interface WebSocketState {
-  socket: WebSocket | null
-  connected: boolean
-  reconnecting: boolean
-  messageQueue: any[]
-  reconnectAttempts: number
-  heartbeatInterval: NodeJS.Timeout | null
-}
+import { MCPConnectionError } from './errors'
+import { WebSocketMCPClient, createWebSocketClient } from './websocket-client'
 
 /**
  * Load MCP tools from a WebSocket server
  * 
- * Note: This is a placeholder implementation. Full WebSocket MCP protocol
- * support would require:
- * 1. WebSocket handshake with MCP protocol negotiation
- * 2. JSON-RPC message framing over WebSocket
- * 3. Proper tool discovery and listing
- * 4. Heartbeat/ping-pong for connection health
- * 
- * For now, this returns a promise that can be extended when WebSocket
- * MCP servers become available.
+ * Connects to a WebSocket MCP server and retrieves available tools
  */
 export async function loadMCPToolsFromWebSocket(
   config: MCPServerConfig
@@ -53,96 +33,31 @@ export async function loadMCPToolsFromWebSocket(
     )
   }
 
-  // For now, throw an error indicating this is not yet fully implemented
-  // This allows the system to register WebSocket servers but they won't connect yet
-  throw new MCPConnectionError(
-    `WebSocket MCP transport is not yet fully implemented. ` +
-    `The infrastructure is in place but requires MCP servers that support WebSocket protocol. ` +
-    `Stay tuned for updates!`,
-    config.id
-  )
-
-  /* 
-   * Future implementation would look like:
-   * 
-   * return new Promise((resolve, reject) => {
-   *   const socket = new WebSocket(url)
-   *   const timeout = setTimeout(() => {
-   *     socket.close()
-   *     reject(new MCPTimeoutError(`Connection timeout for ${config.id}`, config.id))
-   *   }, config.transport.websocket?.connectionTimeout || 30000)
-   *   
-   *   socket.onopen = () => {
-   *     clearTimeout(timeout)
-   *     // Send tool discovery message
-   *     socket.send(JSON.stringify({
-   *       jsonrpc: '2.0',
-   *       method: 'tools/list',
-   *       id: 1
-   *     }))
-   *   }
-   *   
-   *   socket.onmessage = (event) => {
-   *     const response = JSON.parse(event.data)
-   *     if (response.result?.tools) {
-   *       resolve(response.result.tools.map(tool => ({
-   *         name: tool.name,
-   *         description: tool.description,
-   *         inputSchema: tool.inputSchema,
-   *         serverId: config.id
-   *       })))
-   *     }
-   *   }
-   *   
-   *   socket.onerror = (error) => {
-   *     clearTimeout(timeout)
-   *     reject(new MCPConnectionError(`WebSocket error: ${error}`, config.id))
-   *   }
-   * })
-   */
+  // Create client and connect
+  const client = createWebSocketClient(config)
+  
+  try {
+    await client.connect()
+    const tools = await client.getTools()
+    // Keep connection open for future use
+    return tools
+  } catch (error) {
+    await client.disconnect()
+    throw error
+  }
 }
 
 /**
  * Create a WebSocket MCP client
  * 
- * This is a placeholder for future WebSocket MCP client implementation
+ * Returns a client instance that can be reused for multiple operations
  */
 export async function createMCPClientFromWebSocket(
   config: MCPServerConfig
-): Promise<{
-  getTools: () => Promise<MCPToolMetadata[]>
-  close: () => Promise<void>
-  send: (message: any) => Promise<any>
-}> {
-  const state: WebSocketState = {
-    socket: null,
-    connected: false,
-    reconnecting: false,
-    messageQueue: [],
-    reconnectAttempts: 0,
-    heartbeatInterval: null,
-  }
-
-  // Placeholder client
-  return {
-    async getTools() {
-      return loadMCPToolsFromWebSocket(config)
-    },
-    async close() {
-      if (state.socket) {
-        state.socket.close()
-        state.socket = null
-      }
-      if (state.heartbeatInterval) {
-        clearInterval(state.heartbeatInterval)
-        state.heartbeatInterval = null
-      }
-      state.connected = false
-    },
-    async send(message: any) {
-      throw new Error('WebSocket MCP client not yet implemented')
-    },
-  }
+): Promise<WebSocketMCPClient> {
+  const client = createWebSocketClient(config)
+  await client.connect()
+  return client
 }
 
 /**
@@ -159,7 +74,30 @@ export function getWebSocketStatusMessage(): string {
   if (typeof WebSocket === 'undefined') {
     return 'WebSocket is not available in this environment'
   }
-  return 'WebSocket transport infrastructure is ready. Waiting for MCP servers with WebSocket support.'
+  return 'WebSocket transport is fully functional and ready to connect to MCP servers.'
+}
+
+/**
+ * Validate WebSocket URL
+ */
+export function validateWebSocketURL(url: string): {
+  valid: boolean
+  error?: string
+} {
+  if (!url) {
+    return { valid: false, error: 'URL is required' }
+  }
+  
+  if (!url.startsWith('ws://') && !url.startsWith('wss://')) {
+    return { valid: false, error: 'URL must start with ws:// or wss://' }
+  }
+  
+  try {
+    new URL(url)
+    return { valid: true }
+  } catch {
+    return { valid: false, error: 'Invalid URL format' }
+  }
 }
 
 export default {
@@ -167,4 +105,5 @@ export default {
   createMCPClientFromWebSocket,
   isWebSocketAvailable,
   getWebSocketStatusMessage,
+  validateWebSocketURL,
 }

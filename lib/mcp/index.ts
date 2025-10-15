@@ -75,6 +75,31 @@ export {
   createMCPClientFromURL,
 } from './load-mcp-from-url'
 
+export {
+  loadMCPToolsFromWebSocket,
+  createMCPClientFromWebSocket,
+  isWebSocketAvailable,
+  getWebSocketStatusMessage,
+  validateWebSocketURL,
+} from './load-mcp-from-websocket'
+
+// WebSocket Client
+export {
+  WebSocketMCPClient,
+  createWebSocketClient,
+  type WebSocketConnectionState,
+  type WebSocketClientOptions,
+} from './websocket-client'
+
+// Connection Manager
+export {
+  WebSocketConnectionManager,
+  getConnectionManager,
+  type ManagedConnection,
+  type ConnectionManagerEvent,
+  type UseConnectionManagerReturn,
+} from './connection-manager'
+
 // Categories
 export {
   TOOL_CATEGORIES,
