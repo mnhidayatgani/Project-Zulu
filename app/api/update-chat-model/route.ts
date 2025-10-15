@@ -1,5 +1,6 @@
 import { Database } from "@/app/types/database.types"
 import { createClient } from "@/lib/supabase/server"
+import { logger } from "@/lib/logger"
 
 export async function POST(request: Request) {
   try {
@@ -15,7 +16,7 @@ export async function POST(request: Request) {
 
     // If Supabase is not available, we still return success
     if (!supabase) {
-      console.log("Supabase not enabled, skipping DB update")
+      logger.info("Supabase not enabled, skipping DB update")
       return new Response(JSON.stringify({ success: true }), { status: 200 })
     }
 
@@ -27,7 +28,7 @@ export async function POST(request: Request) {
       .eq("id", chatId)
 
     if (error) {
-      console.error("Error updating chat model:", error)
+      logger.error({ error }, "Error updating chat model")
       return new Response(
         JSON.stringify({
           error: "Failed to update chat model",
@@ -41,7 +42,7 @@ export async function POST(request: Request) {
       status: 200,
     })
   } catch (err: unknown) {
-    console.error("Error in update-chat-model endpoint:", err)
+    logger.error({ err }, "Error in update-chat-model endpoint")
     return new Response(
       JSON.stringify({ error: (err as Error).message || "Internal server error" }),
       { status: 500 }

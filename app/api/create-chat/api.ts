@@ -1,6 +1,7 @@
 import { Database } from "@/app/types/database.types"
 import { validateUserIdentity } from "@/lib/server/api"
 import { checkUsageByModel } from "@/lib/usage"
+import { logger } from "@/lib/logger"
 
 type CreateChatInput = {
   userId: string
@@ -45,7 +46,7 @@ export async function createChatInDb({
     .single()
 
   if (error || !data) {
-    console.error("Error creating chat:", error)
+    logger.error({ error, userId }, "Error creating chat")
     return null
   }
 

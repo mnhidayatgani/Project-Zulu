@@ -1,8 +1,10 @@
 import type { Database } from "@/app/types/database.types"
-import { createServerClient } from "@supabase/ssr"
+import { createServerClient, type SupabaseClient } from "@supabase/ssr"
 import { isSupabaseEnabled } from "./config"
 
-export async function createGuestServerClient() {
+export type TypedSupabaseClient = SupabaseClient<Database>
+
+export async function createGuestServerClient(): Promise<TypedSupabaseClient | null> {
   if (!isSupabaseEnabled) {
     return null
   }

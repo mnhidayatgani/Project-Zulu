@@ -1,6 +1,7 @@
 import { Database } from "@/app/types/database.types"
 import { createClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
+import { logger } from "@/lib/logger"
 
 export async function POST(request: Request) {
   try {
@@ -40,7 +41,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     return NextResponse.json(data)
   } catch (err: unknown) {
-    console.error("Error in projects endpoint:", err)
+    logger.error({ err }, "Error in projects endpoint")
 
     return new Response(
       JSON.stringify({

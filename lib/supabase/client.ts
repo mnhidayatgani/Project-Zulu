@@ -1,8 +1,10 @@
 import { Database } from "@/app/types/database.types"
-import { createBrowserClient } from "@supabase/ssr"
+import { createBrowserClient, type SupabaseClient } from "@supabase/ssr"
 import { isSupabaseEnabled } from "./config"
 
-export function createClient() {
+export type TypedSupabaseClient = SupabaseClient<Database>
+
+export function createClient(): TypedSupabaseClient | null {
   if (!isSupabaseEnabled) {
     return null
   }

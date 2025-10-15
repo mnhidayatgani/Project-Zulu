@@ -1,6 +1,7 @@
 import { Database } from "@/app/types/database.types"
 import { createClient } from "@/lib/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
+import { logger } from "@/lib/logger"
 
 export async function GET(
   request: NextRequest,
@@ -40,7 +41,7 @@ export async function GET(
 
     return NextResponse.json(data)
   } catch (err: unknown) {
-    console.error("Error in project endpoint:", err)
+    logger.error({ err }, "Error in project endpoint")
     return new Response(
       JSON.stringify({
         error: (err as Error).message || "Internal server error",
@@ -102,7 +103,7 @@ export async function PUT(
 
     return NextResponse.json(data)
   } catch (err: unknown) {
-    console.error("Error updating project:", err)
+    logger.error({ err }, "Error updating project")
     return new Response(
       JSON.stringify({
         error: (err as Error).message || "Internal server error",
@@ -158,7 +159,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true })
   } catch (err: unknown) {
-    console.error("Error deleting project:", err)
+    logger.error({ err }, "Error deleting project")
     return new Response(
       JSON.stringify({
         error: (err as Error).message || "Internal server error",

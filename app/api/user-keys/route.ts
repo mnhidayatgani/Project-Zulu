@@ -2,6 +2,7 @@ import { encryptKey } from "@/lib/encryption"
 import { getModelsForProvider } from "@/lib/models"
 import { createClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
+import { logger } from "@/lib/logger"
 
 export async function POST(request: Request) {
   try {
@@ -92,11 +93,11 @@ export async function POST(request: Request) {
             .eq("id", authData.user.id)
 
           if (favoritesError) {
-            console.error("Failed to update favorite models:", favoritesError)
+            logger.error({ favoritesError }, "Failed to update favorite models")
           }
         }
       } catch (modelsError) {
-        console.error("Failed to update favorite models:", modelsError)
+        logger.error({ modelsError }, "Failed to update favorite models")
         // Don't fail the main request if favorite models update fails
       }
     }
@@ -109,7 +110,7 @@ export async function POST(request: Request) {
         : "API key updated",
     })
   } catch (error) {
-    console.error("Error in POST /api/user-keys:", error)
+    logger.error({ error }, "Error in POST /api/user-keys")
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -153,7 +154,7 @@ export async function DELETE(request: Request) {
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error("Error in DELETE /api/user-keys:", error)
+    logger.error({ error }, "Error in DELETE /api/user-keys")
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

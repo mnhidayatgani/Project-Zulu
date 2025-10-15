@@ -20,6 +20,7 @@ import { createClient } from "@/lib/supabase/client"
 import { useUser } from "@/lib/user-store/provider"
 import { useMutation } from "@tanstack/react-query"
 import Image from "next/image"
+import type { Database } from "@/app/types/database.types"
 
 type ProModelDialogProps = {
   isOpen: boolean
@@ -40,10 +41,13 @@ export function ProModelDialog({
 
       const supabase = await createClient()
       if (!supabase) throw new Error("Missing supabase")
-      const { error } = await supabase.from("feedback").insert({
+      
+      const feedbackData: Database["public"]["Tables"]["feedback"]["Insert"] = {
         message: `I want access to ${currentModel}`,
         user_id: user.id,
-      })
+      }
+      
+      const { error } = await supabase.from("feedback").insert(feedbackData)
 
       if (error) throw new Error(error.message)
     },

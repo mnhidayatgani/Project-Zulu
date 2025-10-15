@@ -1,9 +1,11 @@
 import { Database } from "@/app/types/database.types"
-import { createServerClient } from "@supabase/ssr"
+import { createServerClient, type SupabaseClient } from "@supabase/ssr"
 import { cookies } from "next/headers"
 import { isSupabaseEnabled } from "./config"
 
-export const createClient = async () => {
+export type TypedSupabaseClient = SupabaseClient<Database>
+
+export const createClient = async (): Promise<TypedSupabaseClient | null> => {
   if (!isSupabaseEnabled) {
     return null
   }
