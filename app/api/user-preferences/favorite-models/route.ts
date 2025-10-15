@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
       .update(updateData)
       .eq("id", user.id)
       .select("favorite_models")
-      .single<{ favorite_models: string[] | null }>()
+      .maybeSingle<{ favorite_models: string[] | null }>()
 
     if (error) {
       console.error("Error updating favorite models:", error)
@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      favorite_models: data.favorite_models,
+      favorite_models: data?.favorite_models || [],
     })
   } catch (error) {
     console.error("Error in favorite-models API:", error)
@@ -101,7 +101,7 @@ export async function GET() {
       .from("users")
       .select("favorite_models")
       .eq("id", user.id)
-      .single<{ favorite_models: string[] | null }>()
+      .maybeSingle<{ favorite_models: string[] | null }>()
 
     if (error) {
       console.error("Error fetching favorite models:", error)
@@ -112,7 +112,7 @@ export async function GET() {
     }
 
     return NextResponse.json({
-      favorite_models: data.favorite_models || [],
+      favorite_models: data?.favorite_models || [],
     })
   } catch (error) {
     console.error("Error in favorite-models GET API:", error)
