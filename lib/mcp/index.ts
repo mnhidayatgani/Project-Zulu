@@ -187,6 +187,55 @@ export {
   batchTrackExecutions,
 } from './track-execution'
 
+// Supabase Sync
+export {
+  // Master sync
+  setupMCPSync,
+  syncAllFromDB,
+  syncAllToDB,
+  forceSyncNow,
+  getSyncStatus,
+  getLastSyncTime,
+  isSyncAvailable,
+  migrateToSupabase,
+  clearAllSyncData,
+  type SyncStatus,
+  type SyncDirection,
+} from './sync'
+
+export {
+  // Favorites sync
+  syncFavoritesFromDB,
+  syncFavoritesToDB,
+  addFavoriteWithSync,
+  removeFavoriteWithSync,
+  updateFavoriteWithSync,
+  incrementUseCountWithSync,
+  setupFavoritesSync,
+} from './favorites-sync'
+
+export {
+  // Execution history sync
+  syncExecutionHistoryFromDB,
+  syncExecutionHistoryToDB,
+  recordExecutionWithSync,
+  clearExecutionHistoryWithSync,
+  setupExecutionHistorySync,
+  batchSyncExecutions,
+} from './execution-history-sync'
+
+export {
+  // Search sync
+  syncSavedSearchesFromDB,
+  syncSavedSearchesToDB,
+  saveSearchWithSync,
+  deleteSavedSearchWithSync,
+  syncSearchHistoryFromDB,
+  recordSearchWithSync,
+  setupSearchesSync,
+  clearSearchHistoryWithSync,
+} from './search-sync'
+
 /**
  * Quick start guide for using MCP in Zola
  * 
