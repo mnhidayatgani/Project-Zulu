@@ -59,7 +59,26 @@ export function createMockFile(
   content = ''
 ): File {
   const blob = new Blob([content], { type })
-  return new File([blob], name, { type })
+  const file = new File([blob], name, { type })
+  
+  // Override size property
+  Object.defineProperty(file, 'size', {
+    value: size,
+    writable: false,
+  })
+  
+  // Add arrayBuffer method if it doesn't exist (for Node environment)
+  if (!file.arrayBuffer) {
+    Object.defineProperty(file, 'arrayBuffer', {
+      value: async function() {
+        // Create a buffer with the specified size
+        const buffer = new ArrayBuffer(Math.min(size, 4100))
+        return buffer
+      },
+    })
+  }
+  
+  return file
 }
 
 /**
