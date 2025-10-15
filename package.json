@@ -1,7 +1,48 @@
 {
-  "name": "Project Zulu",
-  "version": "0.1.0",
+  "name": "zulu",
+  "version": "1.0.0",
   "private": true,
+  "description": "Enhanced AI chat interface built on Zola - featuring MCP integration, analytics, and production-ready features",
+  "author": {
+    "name": "Muhammad Nurhidayat Gani",
+    "email": "support@aistorytell.me",
+    "url": "https://github.com/mnhidayatgani"
+  },
+  "contributors": [
+    {
+      "name": "Julien Thibeaut",
+      "email": "julien@thibeaut.dev",
+      "url": "https://github.com/ibelick"
+    },
+    {
+      "name": "Claude (Anthropic AI)",
+      "url": "https://anthropic.com"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mnhidayatgani/zulu.git"
+  },
+  "homepage": "https://github.com/mnhidayatgani/zulu#readme",
+  "bugs": {
+    "url": "https://github.com/mnhidayatgani/zulu/issues"
+  },
+  "keywords": [
+    "ai",
+    "chat",
+    "chatbot",
+    "openai",
+    "anthropic",
+    "claude",
+    "gpt",
+    "gemini",
+    "ollama",
+    "mcp",
+    "model-context-protocol",
+    "nextjs",
+    "react",
+    "typescript"
+  ],
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
