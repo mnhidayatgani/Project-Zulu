@@ -12,16 +12,44 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { TOOL_CATEGORIES } from "@/lib/mcp/categories"
 import type { MCPToolMetadata } from "@/lib/mcp/types"
-import { Code } from "@phosphor-icons/react"
+import { Code, Star } from "@phosphor-icons/react"
+import { useState, useEffect } from "react"
+import { isFavorite, addFavorite, removeFavorite } from "@/lib/mcp/favorites"
 
 interface MCPToolCardProps {
   tool: MCPToolMetadata
   onViewDetails?: (tool: MCPToolMetadata) => void
   onUse?: (tool: MCPToolMetadata) => void
+  serverId?: string
+  serverName?: string
 }
 
-export function MCPToolCard({ tool, onViewDetails, onUse }: MCPToolCardProps) {
+export function MCPToolCard({ tool, onViewDetails, onUse, serverId = "unknown", serverName = "Unknown Server" }: MCPToolCardProps) {
   const category = TOOL_CATEGORIES.find((c) => c.id === tool.category)
+  const [isFavorited, setIsFavorited] = useState(false)
+
+  useEffect(() => {
+    setIsFavorited(isFavorite(serverId, tool.name))
+  }, [serverId, tool.name])
+
+  const handleToggleFavorite = () => {
+    if (isFavorited) {
+      removeFavorite(serverId, tool.name)
+      setIsFavorited(false)
+    } else {
+      addFavorite({
+        serverId,
+        serverName,
+        toolName: tool.name,
+        toolDescription: tool.description,
+        tags: tool.category ? [tool.category] : []
+      })
+      setIsFavorited(true)
+    }
+    
+    // Dispatch event to update favorites bar
+    window.dispatchEvent(new Event('mcp-favorites-changed'))
+  }
 
   return (
     <Card className="hover:border-primary/50 transition-colors">
@@ -31,6 +59,29 @@ export function MCPToolCard({ tool, onViewDetails, onUse }: MCPToolCardProps) {
             <CardTitle className="text-base flex items-center gap-2">
               <Code className="size-4 shrink-0" weight="bold" />
               <span className="truncate">{tool.name}</span>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={handleToggleFavorite}
+                      className="h-6 w-6 p-0 ml-auto"
+                    >
+                      <Star
+                        className="size-4"
+                        weight={isFavorited ? "fill" : "regular"}
+                        style={{ color: isFavorited ? "#fbbf24" : "currentColor" }}
+                      />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="text-xs">
+                      {isFavorited ? "Remove from favorites" : "Add to favorites"}
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </CardTitle>
             <CardDescription className="mt-1.5 line-clamp-2">
               {tool.description || "No description provided"}
