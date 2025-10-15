@@ -1,3 +1,6 @@
+// Set NODE_ENV to test to ensure React runs in development mode
+process.env.NODE_ENV = 'test'
+
 // Learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom'
 import { TextEncoder, TextDecoder } from 'util'
