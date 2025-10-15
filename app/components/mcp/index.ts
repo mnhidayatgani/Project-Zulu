@@ -17,3 +17,8 @@ export { MCPConnectionIndicator, MCPConnectionDot } from './mcp-connection-indic
 export { MCPServerStatus, MCPServerStatusCompact } from './mcp-server-status'
 export { MCPMarketplace } from './mcp-marketplace'
 export { MCPMarketplaceCard, MCPMarketplaceCardCompact } from './mcp-marketplace-card'
+export { MCPFavoritesBar } from './mcp-favorites-bar'
+export { MCPFavoritesDialog } from './mcp-favorites-dialog'
+export { MCPAdvancedSearch } from './mcp-advanced-search'
+export { MCPExecutionHistory } from './mcp-execution-history'
+export { MCPExecutionLogItem } from './mcp-execution-log-item'

@@ -14,14 +14,19 @@ import { MCPServerList } from "./mcp-server-list"
 import { MCPRegisterDialog } from "./mcp-register-dialog"
 import { MCPToolGrid } from "./mcp-tool-grid"
 import { MCPAnalyticsDashboard } from "./mcp-analytics-dashboard"
-import { Plugs, ListChecks, GridFour, ChartBar } from "@phosphor-icons/react"
+import { MCPMarketplace } from "./mcp-marketplace"
+import { MCPExecutionHistory } from "./mcp-execution-history"
+import { MCPFavoritesBar } from "./mcp-favorites-bar"
+import { Plugs, ListChecks, GridFour, ChartBar, ShoppingBag, ClockCounterClockwise } from "@phosphor-icons/react"
 import type { AnalyticsSummary, MCPToolMetadata } from "@/lib/mcp/types"
+import type { FavoriteTool } from "@/lib/mcp/favorites"
 
 export function MCPManager() {
   const [refreshKey, setRefreshKey] = useState(0)
   const [analyticsSummary, setAnalyticsSummary] = useState<AnalyticsSummary | null>(null)
   const [tools, setTools] = useState<MCPToolMetadata[]>([])
   const [loading, setLoading] = useState(true)
+  const [selectedFavoriteTool, setSelectedFavoriteTool] = useState<FavoriteTool | null>(null)
 
   const handleSuccess = () => {
     setRefreshKey((prev) => prev + 1)
@@ -79,6 +84,18 @@ export function MCPManager() {
     }
   }
 
+  const handleFavoriteToolSelect = (tool: FavoriteTool) => {
+    setSelectedFavoriteTool(tool)
+    // TODO: Navigate to tool or execute it
+    console.log("Selected favorite tool:", tool)
+  }
+
+  const handleMarketplaceInstall = (server: any) => {
+    // Refresh server list after installation
+    setRefreshKey((prev) => prev + 1)
+    console.log("Server installed:", server)
+  }
+
   return (
     <div className="space-y-6">
       <Card>
@@ -98,7 +115,7 @@ export function MCPManager() {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="servers" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-6">
               <TabsTrigger value="servers">
                 <ListChecks className="size-4 mr-2" />
                 Servers
@@ -106,6 +123,14 @@ export function MCPManager() {
               <TabsTrigger value="tools">
                 <GridFour className="size-4 mr-2" />
                 Tools
+              </TabsTrigger>
+              <TabsTrigger value="marketplace">
+                <ShoppingBag className="size-4 mr-2" />
+                Marketplace
+              </TabsTrigger>
+              <TabsTrigger value="history">
+                <ClockCounterClockwise className="size-4 mr-2" />
+                History
               </TabsTrigger>
               <TabsTrigger value="analytics">
                 <ChartBar className="size-4 mr-2" />
@@ -119,13 +144,24 @@ export function MCPManager() {
             </TabsContent>
 
             <TabsContent value="tools" className="mt-6">
-              <MCPToolGrid
-                tools={tools}
-                onViewDetails={(tool) => {
-                  // TODO: Open tool details dialog
-                  console.log("View tool details:", tool)
-                }}
-              />
+              <div className="space-y-4">
+                <MCPFavoritesBar onToolSelect={handleFavoriteToolSelect} />
+                <MCPToolGrid
+                  tools={tools}
+                  onViewDetails={(tool) => {
+                    // TODO: Open tool details dialog
+                    console.log("View tool details:", tool)
+                  }}
+                />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="marketplace" className="mt-6">
+              <MCPMarketplace onInstall={handleMarketplaceInstall} />
+            </TabsContent>
+
+            <TabsContent value="history" className="mt-6">
+              <MCPExecutionHistory />
             </TabsContent>
 
             <TabsContent value="analytics" className="mt-6">
