@@ -1,0 +1,41 @@
+=============================================================================
+                    NEXT SESSION: PHASE 4C WITH REACT 18
+=============================================================================
+
+CONTEXT:
+- Branch: refactor/foundation (32 commits ahead)
+- Phase 4B: ✅ COMPLETE (79 tests passing)
+- Phase 4C: ⚠️ BLOCKED by React 19 (102 tests written, 0 running)
+
+OBJECTIVE:
+Downgrade to React 18 and run Phase 4C component tests
+
+STEPS:
+1. Downgrade React:
+   npm install react@18 react-dom@18 --legacy-peer-deps
+
+2. Run component tests:
+   npm test -- __tests__/components/ui/
+
+3. Verify all tests pass:
+   npm test
+
+EXPECTED RESULT:
+- 181 tests total (79 unit + 102 component)
+- All tests passing
+- Execution time: ~2-3s
+
+FILES READY:
+- __tests__/components/ui/button.test.tsx (30 tests)
+- __tests__/components/ui/input.test.tsx (33 tests)  
+- __tests__/components/ui/badge.test.tsx (39 tests)
+
+AFTER SUCCESS:
+- Commit test results
+- Add more component tests
+- Move to Phase 4D or Phase 5
+
+COPY-PASTE PROMPT:
+"Downgrade to React 18 and run Phase 4C component tests"
+
+=============================================================================
