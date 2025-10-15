@@ -2,7 +2,7 @@
 
 import { MultiModelConversation } from "@/app/components/multi-chat/multi-conversation"
 import { toast } from "@/components/ui/toast"
-import { getOrCreateGuestUserId } from "@/lib/api"
+import { getOrCreateGuestUserId } from "@/lib/legacy-api"
 import { useChats } from "@/lib/chat-store/chats/provider"
 import { useMessages } from "@/lib/chat-store/messages/provider"
 import { useChatSession } from "@/lib/chat-store/session/provider"

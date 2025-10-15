@@ -61,10 +61,11 @@ export interface CsrfToken {
 
 // Rate Limits
 export interface RateLimitResponse {
+  dailyCount: number
+  dailyProCount: number
+  dailyLimit: number
   remaining: number
-  limit: number
-  resetAt: string
-  isAnonymous: boolean
+  remainingPro: number
 }
 
 // User Types
@@ -101,7 +102,9 @@ export interface Project {
   id: string
   name: string
   userId: string
+  user_id: string  // Database column name (alias for compatibility)
   createdAt: string
+  created_at: string  // Database column name (alias for compatibility)
 }
 
 export interface CreateProjectRequest {

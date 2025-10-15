@@ -1,4 +1,4 @@
-import { UsageLimitError } from "@/lib/api"
+import { UsageLimitError } from "@/lib/legacy-api"
 import {
   AUTH_DAILY_MESSAGE_LIMIT,
   DAILY_LIMIT_PRO_MODELS,

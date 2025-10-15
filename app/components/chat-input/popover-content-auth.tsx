@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { PopoverContent } from "@/components/ui/popover"
-import { signInWithGoogle } from "@/lib/api"
+import { signInWithGoogle } from "@/lib/legacy-api"
 import { APP_NAME } from "@/lib/config"
 import { createClient } from "@/lib/supabase/client"
 import { isSupabaseEnabled } from "@/lib/supabase/config"

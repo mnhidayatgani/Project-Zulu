@@ -3,6 +3,7 @@
 import { FolderPlusIcon } from "@phosphor-icons/react"
 import { useQuery } from "@tanstack/react-query"
 import { useState } from "react"
+import { api } from "@/lib/api"
 import { DialogCreateProject } from "./dialog-create-project"
 import { SidebarProjectItem } from "./sidebar-project-item"
 
@@ -16,14 +17,14 @@ type Project = {
 export function SidebarProject() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
-  const { data: projects = [], isLoading } = useQuery<Project[]>({
+  const { data: projects = [], isLoading } = useQuery({
     queryKey: ["projects"],
     queryFn: async () => {
-      const response = await fetch("/api/projects")
-      if (!response.ok) {
-        throw new Error("Failed to fetch projects")
+      const result = await api.projects.getProjects()
+      if (!result.success || !result.data) {
+        throw new Error(result.error?.message || "Failed to fetch projects")
       }
-      return response.json()
+      return result.data
     },
   })
 

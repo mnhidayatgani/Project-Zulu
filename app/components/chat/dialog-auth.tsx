@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { signInWithGoogle } from "@/lib/api"
+import { signInWithGoogle } from "@/lib/legacy-api"
 import { createClient } from "@/lib/supabase/client"
 import { isSupabaseEnabled } from "@/lib/supabase/config"
 import Image from "next/image"

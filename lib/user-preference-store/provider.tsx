@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { createContext, ReactNode, useContext } from "react"
+import { api } from "@/lib/api"
 import {
   convertFromApiFormat,
   convertToApiFormat,
@@ -37,31 +38,25 @@ const UserPreferencesContext = createContext<
 >(undefined)
 
 async function fetchUserPreferences(): Promise<UserPreferences> {
-  const response = await fetch("/api/user-preferences")
-  if (!response.ok) {
-    throw new Error("Failed to fetch user preferences")
+  const result = await api.user.getUserPreferences()
+  
+  if (!result.success) {
+    throw new Error(result.error?.message || "Failed to fetch user preferences")
   }
-  const data = await response.json()
-  return convertFromApiFormat(data)
+  
+  return convertFromApiFormat(result.data)
 }
 
 async function updateUserPreferences(
   update: Partial<UserPreferences>
 ): Promise<UserPreferences> {
-  const response = await fetch("/api/user-preferences", {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(convertToApiFormat(update)),
-  })
-
-  if (!response.ok) {
-    throw new Error("Failed to update user preferences")
+  const result = await api.user.updateUserPreferences(convertToApiFormat(update))
+  
+  if (!result.success) {
+    throw new Error(result.error?.message || "Failed to update user preferences")
   }
 
-  const data = await response.json()
-  return convertFromApiFormat(data)
+  return convertFromApiFormat(result.data)
 }
 
 function getLocalStoragePreferences(): UserPreferences {

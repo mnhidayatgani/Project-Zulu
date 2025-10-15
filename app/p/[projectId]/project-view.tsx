@@ -14,6 +14,7 @@ import { Attachment } from "@/lib/file-handling"
 import { API_ROUTE_CHAT } from "@/lib/routes"
 import { useUser } from "@/lib/user-store/provider"
 import { cn } from "@/lib/utils"
+import { api } from "@/lib/api"
 import { useChat } from "@ai-sdk/react"
 import { ChatCircleIcon } from "@phosphor-icons/react"
 import { useQuery } from "@tanstack/react-query"
@@ -51,14 +52,14 @@ export function ProjectView({ projectId }: ProjectViewProps) {
   } = useFileUpload()
 
   // Fetch project details
-  const { data: project } = useQuery<Project>({
+  const { data: project } = useQuery({
     queryKey: ["project", projectId],
     queryFn: async () => {
-      const response = await fetch(`/api/projects/${projectId}`)
-      if (!response.ok) {
-        throw new Error("Failed to fetch project")
+      const result = await api.projects.getProject(projectId)
+      if (!result.success || !result.data) {
+        throw new Error(result.error?.message || "Failed to fetch project")
       }
-      return response.json()
+      return result.data
     },
   })
 
